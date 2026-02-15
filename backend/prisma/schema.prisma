@@ -1,0 +1,338 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String    @id @default(uuid())
+  name       String?
+  email      String    @unique
+  password   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isVerified Boolean   @default(false)
+  otp        String?
+  otpExpires DateTime?
+  role       String    @default("USER")
+  shops      Shop[]
+}
+
+model Shop {
+  id         String     @id @default(uuid())
+  ownerId    String
+  name       String
+  address    String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  gstin      String?
+  mobile     String?
+  bills      Bill[]
+  categories Category[]
+  products   Product[]
+  suppliers  Supplier[]
+  customers  Customer[]
+  purchaseOrders PurchaseOrder[]
+  owner      User       @relation(fields: [ownerId], references: [id])
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  shopId         String
+  name           String
+  costPrice      Decimal         @default(0) @db.Decimal(10, 2)
+  sellingPrice   Decimal         @default(0) @db.Decimal(10, 2)
+  stock          Float           @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  barcode        String?
+  categoryId     String?
+  description    String?
+  isActive       Boolean         @default(true)
+  reorderLevel   Float           @default(5)
+  sku            String?
+  quantityType   QuantityType    @default(PIECES)
+  billItems      BillItem[]
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  shop           Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  stockMovements StockMovement[]
+  purchaseOrderItems PurchaseOrderItem[]
+  customerPricing CustomerPricing[]
+  supplierProducts SupplierProduct[]
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  shopId    String
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  discountPercentage Decimal @default(0) @db.Decimal(5, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customPricing CustomerPricing[]
+  bills     Bill[]
+}
+
+model CustomerPricing {
+  id          String   @id @default(uuid())
+  customerId  String
+  productId   String
+  customPrice Decimal  @db.Decimal(10, 2)
+  discountPercentage Decimal @default(0) @db.Decimal(5, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, productId])
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  shopId    String
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  shop      Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  products  Product[]
+}
+
+model StockMovement {
+  id              String       @id @default(uuid())
+  productId       String
+  type            MovementType
+  quantity        Float
+  batchNumber     String?
+  expiryDate      DateTime?
+  referenceNumber String?
+  notes           String?
+  createdBy       String?
+  createdAt       DateTime     @default(now())
+  product         Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Bill {
+  id             String      @id @default(uuid())
+  shopId         String
+  customerId     String?
+  billNumber     String
+  customerName   String?
+  totalAmount    Decimal     @db.Decimal(10, 2)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  cgst           Decimal     @default(0) @db.Decimal(10, 2)
+  customerMobile String?
+  grandTotal     Decimal     @db.Decimal(10, 2)
+  igst           Decimal     @default(0) @db.Decimal(10, 2)
+  sgst           Decimal     @default(0) @db.Decimal(10, 2)
+  status         BillStatus  @default(PAID)
+  subTotal       Decimal     @db.Decimal(10, 2)
+  taxAmount      Decimal     @db.Decimal(10, 2)
+  paymentMode    PaymentMode @default(CASH)
+  shop           Shop        @relation(fields: [shopId], references: [id])
+  customer       Customer?   @relation(fields: [customerId], references: [id])
+  items          BillItem[]
+}
+
+model BillItem {
+  id        String  @id @default(uuid())
+  billId    String
+  productId String
+  quantity  Float
+  taxAmount Decimal @db.Decimal(10, 2)
+  price     Decimal @db.Decimal(10, 2)
+  bill      Bill    @relation(fields: [billId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Backup {
+  id           String       @id @default(uuid())
+  shopId       String?
+  type         BackupType
+  fileName     String
+  filePath     String
+  fileSize     Int
+  status       BackupStatus @default(PENDING)
+  isAutomatic  Boolean      @default(false)
+  errorMessage String?
+  createdAt    DateTime     @default(now())
+  completedAt  DateTime?
+}
+
+model NotificationLog {
+  id           String             @id @default(uuid())
+  userId       String?
+  shopId       String?
+  type         NotificationType
+  recipient    String
+  subject      String
+  body         String
+  status       NotificationStatus @default(PENDING)
+  errorMessage String?
+  metadata     String?
+  sentAt       DateTime?
+  createdAt    DateTime           @default(now())
+}
+
+model Supplier {
+  id            String          @id @default(uuid())
+  shopId        String
+  name          String
+  code          String?
+  contact_person String?
+  email         String?
+  phone         String?
+  address       String?
+  city          String?
+  payment_terms String?
+  notes         String?
+  is_active     Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  shop          Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  purchaseOrders PurchaseOrder[]
+  supplierProducts SupplierProduct[]
+}
+
+model PurchaseOrder {
+  id                   String              @id @default(uuid())
+  shopId               String
+  supplier_id           String
+  order_date            DateTime            @default(now())
+  expected_delivery_date DateTime?
+  status               PurchaseOrderStatus @default(PENDING)
+  total_amount          Decimal             @default(0) @db.Decimal(10, 2)
+  notes                String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  shop                 Shop                @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  supplier             Supplier            @relation(fields: [supplier_id], references: [id])
+  items                PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(uuid())
+  purchaseOrderId String
+  productId       String
+  quantity        Float
+  costPrice       Decimal       @db.Decimal(10, 2)
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id])
+}
+
+model SupplierProduct {
+  id          String   @id @default(uuid())
+  supplierId  String
+  productId   String
+  costPrice   Decimal  @db.Decimal(10, 2)
+  supplierSku String?
+  isPreferred Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, productId])
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  ORDERED
+  RECEIVED
+  CANCELLED
+  PARTIALLY_RECEIVED
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+enum QuantityType {
+  PIECES
+  KG
+  LITERS
+}
+
+enum BillStatus {
+  PAID
+  CANCELLED
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  NET_BANKING
+}
+
+enum BackupType {
+  FULL_DATABASE
+  INVENTORY
+  BILLS
+  REPORTS
+}
+
+enum BackupStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  LOW_STOCK_ALERT
+  BACKUP_SUCCESS
+  BACKUP_FAILURE
+  OTP_VERIFICATION
+  WELCOME_EMAIL
+  PASSWORD_RESET
+  GENERAL
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  RETRYING
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  table_name String
+  action     String
+  user_id    String?
+  record_id  String?
+  old_values Json?
+  new_values Json?
+  created_at DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model Profile {
+  id         String     @id @default(uuid())
+  email      String?
+  full_name  String?
+  avatar_url String?
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  
+  @@map("profiles")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  user_id   String
+  role      String
+  created_at DateTime @default(now())
+
+  @@map("user_roles")
+  @@unique([user_id, role])
+}
