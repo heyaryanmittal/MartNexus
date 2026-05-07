@@ -195,34 +195,47 @@ const Index = () => {
         .mn-nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           display: flex; align-items: center; justify-content: space-between;
-          padding: 1rem 2rem;
+          padding: 0.75rem 2rem;
           background: rgba(3, 7, 18, 0.6);
-          backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+          backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         .mn-nav-logo {
-          display: flex; align-items: center; gap: 1rem;
+          display: flex; align-items: center; gap: 0.75rem;
           font-family: 'Space Grotesk', sans-serif;
-          font-size: 1.6rem; font-weight: 700;
+          font-size: 1.4rem; font-weight: 700;
           color: #fff;
           letter-spacing: -0.5px;
+          cursor: pointer;
         }
-        .mn-nav-logo img { width: 64px; height: 64px; object-fit: contain; }
+        .mn-nav-logo img { width: 48px; height: 48px; object-fit: contain; }
+        
+        .mn-nav-links {
+          display: flex; gap: 2.5rem;
+          position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        .mn-nav-link {
+          font-size: 0.9rem; font-weight: 500; color: #94a3b8;
+          text-decoration: none; transition: all 0.2s;
+          cursor: pointer;
+        }
+        .mn-nav-link:hover { color: #fff; }
+
         .mn-nav-actions { display: flex; gap: 0.75rem; align-items: center; }
         .mn-btn-ghost {
-          background: transparent; border: 1px solid rgba(99, 102, 241, 0.4);
-          color: #a5b4fc; padding: 0.45rem 1.1rem; border-radius: 8px;
-          font-size: 0.875rem; font-weight: 500; cursor: pointer;
+          background: transparent; border: none;
+          color: #94a3b8; padding: 0.5rem 1.25rem; border-radius: 10px;
+          font-size: 0.9rem; font-weight: 600; cursor: pointer;
           transition: all 0.2s;
         }
-        .mn-btn-ghost:hover { border-color: #6366f1; color: #fff; background: rgba(99,102,241,0.1); }
+        .mn-btn-ghost:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .mn-btn-primary {
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          border: none; color: #fff; padding: 0.45rem 1.25rem; border-radius: 8px;
-          font-size: 0.875rem; font-weight: 600; cursor: pointer;
-          transition: all 0.25s; box-shadow: 0 4px 15px rgba(99,102,241,0.35);
+          background: #fff;
+          border: none; color: #000; padding: 0.6rem 1.5rem; border-radius: 10px;
+          font-size: 0.9rem; font-weight: 700; cursor: pointer;
+          transition: all 0.25s;
         }
-        .mn-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(99,102,241,0.5); }
+        .mn-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 20px -10px rgba(255,255,255,0.3); background: #f8fafc; }
 
         /* ── PAGE WRAPPER ── */
         .mn-page {
@@ -506,6 +519,7 @@ const Index = () => {
 
         /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
+          .mn-nav-links { display: none; }
           .feat-lg, .feat-md, .feat-sm { grid-column: span 12; }
           .mn-modern-step, .mn-modern-step:nth-child(even) { flex-direction: column; text-align: center; gap: 2rem; }
           .mn-modern-step p { margin: 0 auto; }
@@ -522,10 +536,18 @@ const Index = () => {
       <div className="mn-page">
         {/* ── Navbar ── */}
         <nav className="mn-nav">
-          <div className="mn-nav-logo">
+          <div className="mn-nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <img src="/logo.png" alt="MartNexus Logo" />
             MartNexus
           </div>
+
+          <div className="mn-nav-links">
+            <a className="mn-nav-link" onClick={() => document.getElementById("mn-features").scrollIntoView({ behavior: "smooth" })}>Features</a>
+            <a className="mn-nav-link">Solutions</a>
+            <a className="mn-nav-link">Pricing</a>
+            <a className="mn-nav-link">About</a>
+          </div>
+
           <div className="mn-nav-actions">
             <button className="mn-btn-ghost" onClick={() => navigate("/auth")}>
               Log In
