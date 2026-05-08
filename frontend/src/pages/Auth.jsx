@@ -350,9 +350,16 @@ export default function Auth() {
         .auth-left-logo {
           font-family: 'Space Grotesk', sans-serif;
           font-size: 1.5rem; font-weight: 800;
+          cursor: pointer; position: relative; z-index: 1;
+          display: flex; align-items: center; gap: 0.85rem;
+        }
+        .auth-left-logo span {
           background: linear-gradient(135deg, #6366f1, #22d3ee);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          cursor: pointer; position: relative; z-index: 1;
+        }
+        .auth-logo-img {
+          width: 38px; height: 38px; object-fit: contain;
+          filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));
         }
         .auth-left-hero {
           flex: 1; display: flex; flex-direction: column;
@@ -524,10 +531,12 @@ export default function Auth() {
       <div className="auth-page">
         {/* ── Left Panel ── */}
         <div className="auth-left">
-          <div className="auth-left-logo" onClick={() => navigate("/")}>MartNexus</div>
+          <div className="auth-left-logo" onClick={() => navigate("/")}>
+            <img src="/martnexus.png" alt="MartNexus Logo" className="auth-logo-img" />
+            <span>MartNexus</span>
+          </div>
 
           <div className="auth-left-hero">
-            <div className="auth-left-badge">✦ Inventory Intelligence</div>
             <h1 className="auth-left-title">
               Manage smarter.<br />
               <span>Grow faster.</span>
@@ -562,7 +571,8 @@ export default function Auth() {
               id="auth-mobile-logo"
               onClick={() => navigate("/")}
             >
-              MartNexus
+              <img src="/martnexus.png" alt="MartNexus Logo" className="auth-logo-img" style={{ width: "32px", height: "32px" }} />
+              <span>MartNexus</span>
             </div>
 
             {/* Tab Switcher */}

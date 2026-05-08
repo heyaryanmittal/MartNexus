@@ -31,11 +31,11 @@ export function AppSidebar() {
   const visibleManagementItems = filterByRole(managementItems);
   return (<Sidebar collapsible="icon">
     <SidebarContent>
-      <div className="p-4 border-b">
-        <h2 className={`font-bold text-xl text-primary ${!open && "hidden"}`}>
+      <div className="p-4 border-b flex items-center gap-3">
+        <img src="/martnexus.png" alt="MartNexus" className="w-8 h-8 object-contain" />
+        <h2 className={`font-bold text-xl text-primary transition-all duration-300 ${!open && "hidden"}`}>
           <span className="text-green-800">M</span>art<span className="text-green-800">N</span>exus
         </h2>
-        {!open && <span className="text-primary text-xl font-bold">MN</span>}
       </div>
 
       <SidebarGroup>

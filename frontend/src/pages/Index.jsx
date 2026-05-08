@@ -684,7 +684,7 @@ const Index = () => {
         {/* ── Navbar ── */}
         <nav className="mn-nav">
           <div className="mn-nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-            <img src="/logo.png" alt="MartNexus Logo" />
+            <img src="/martnexus.png" alt="MartNexus Logo" />
             MartNexus
           </div>
 
@@ -1027,7 +1027,7 @@ const Index = () => {
           <div className="mn-footer-container">
             <div className="mn-footer-brand">
               <div className="mn-footer-logo">
-                <img src="/logo.png" alt="MartNexus Logo" />
+                <img src="/martnexus.png" alt="MartNexus Logo" />
                 MartNexus
               </div>
               <p className="mn-footer-desc">
