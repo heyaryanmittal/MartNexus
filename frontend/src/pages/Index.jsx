@@ -466,8 +466,8 @@ const Index = () => {
         }
         
         .mn-step-visual {
-          flex: 1; height: 350px; border-radius: 28px;
-          background: rgba(15, 23, 42, 0.3);
+          flex: 1; aspect-ratio: 1/1; max-width: 400px; border-radius: 32px;
+          background: rgba(15, 23, 42, 0.2);
           border: 1px solid rgba(255, 255, 255, 0.08);
           position: relative; overflow: hidden;
           display: flex; align-items: center; justify-content: center;
@@ -481,15 +481,10 @@ const Index = () => {
         }
         .mn-step-visual img {
           width: 100%; height: 100%; object-fit: cover;
-          opacity: 0.85; transition: opacity 0.5s, transform 0.5s;
+          transition: opacity 0.5s, transform 0.5s;
         }
         .mn-step-visual:hover img {
-          opacity: 1; transform: scale(1.05);
-        }
-        .mn-step-visual::after {
-          content: ""; position: absolute; inset: 0;
-          background: radial-gradient(circle at center, transparent 30%, rgba(3, 7, 18, 0.4) 100%);
-          pointer-events: none;
+          transform: scale(1.05);
         }
 
         .mn-step-content { flex: 1; }
@@ -606,7 +601,7 @@ const Index = () => {
         }
         .mn-about-text { flex: 1; }
         .mn-about-visual {
-          flex: 1; height: 450px; border-radius: 32px;
+          flex: 1; aspect-ratio: 1/1; max-width: 500px; border-radius: 32px;
           background: rgba(15, 23, 42, 0.4);
           border: 1px solid rgba(255, 255, 255, 0.05);
           overflow: hidden;
@@ -614,7 +609,7 @@ const Index = () => {
         }
         .mn-about-visual img {
           width: 100%; height: 100%; object-fit: cover;
-          opacity: 0.8; transition: all 0.5s;
+          transition: all 0.5s;
         }
         .mn-about-visual:hover img { transform: scale(1.05); opacity: 1; }
         .mn-about-overlay {
