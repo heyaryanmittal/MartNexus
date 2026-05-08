@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { 
+  Package, Store, BarChart3, ShieldCheck, FileText, Bell, 
+  PlusCircle, ShoppingBag, Cpu, ShoppingCart, Wine, Settings2,
+  ArrowRight
+} from "lucide-react";
 
 /* ─────────────────────────────────────────
    Three.js Scene (runs once after mount)
@@ -142,13 +147,33 @@ function StatCard({ value, label }) {
   );
 }
 
+function CheckIcon() {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" style={{ width: "18px", height: "18px", marginTop: "2px", flexShrink: 0 }}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+    </svg>
+  );
+}
+
 /* ─────────────────────────────────────────
    Landing Page
 ───────────────────────────────────────── */
 const Index = () => {
   const navigate = useNavigate();
   const sceneRef = useRef(null);
+  const spotlightRef = useRef(null);
   useThreeScene(sceneRef);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (spotlightRef.current) {
+        spotlightRef.current.style.left = `${e.clientX}px`;
+        spotlightRef.current.style.top = `${e.clientY}px`;
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   const features = [
     {
@@ -189,7 +214,14 @@ const Index = () => {
       <style>{`
         /* Fonts */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+          font-family: 'Inter', sans-serif; 
+          background-color: #030712;
+          background-image: 
+            radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
+          background-size: 32px 32px;
+          color: #e2e8f0;
+        }
 
         /* ── NAVBAR ── */
         .mn-nav {
@@ -269,6 +301,17 @@ const Index = () => {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.1); opacity: 0.7; }
         }
+        
+        /* ── CURSOR SPOTLIGHT ── */
+        .mn-spotlight {
+          position: fixed; top: 0; left: 0; width: 600px; height: 600px;
+          background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+          border-radius: 50%; pointer-events: none; z-index: 99;
+          transform: translate(-50%, -50%);
+          mix-blend-mode: plus-lighter;
+          transition: opacity 0.3s;
+        }
+
         .mn-hero-content {
           position: relative; z-index: 2; text-align: center; max-width: 820px;
         }
@@ -337,10 +380,10 @@ const Index = () => {
         .mn-stat-value {
           font-family: 'Space Grotesk', sans-serif;
           font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800;
-          background: linear-gradient(135deg, #fff, #6366f1);
+          background: linear-gradient(135deg, #fff, #6366f1, #22d3ee);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .mn-stat-label { font-size: 0.9rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.02em; }
+        .mn-stat-label { font-size: 0.9rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
 
         /* ── SECTION HEADERS ── */
         .mn-section {
@@ -376,11 +419,11 @@ const Index = () => {
         }
         .mn-feature-item {
           background: rgba(15, 23, 42, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 24px; padding: 2.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 24px; padding: 3rem;
           position: relative; overflow: hidden;
-          transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-          backdrop-filter: blur(10px);
+          transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+          backdrop-filter: blur(12px);
           display: flex; flex-direction: column;
         }
         .mn-feature-item:hover {
@@ -423,18 +466,31 @@ const Index = () => {
         }
         
         .mn-step-visual {
-          flex: 1; height: 320px; border-radius: 24px;
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.05));
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          flex: 1; height: 350px; border-radius: 28px;
+          background: rgba(15, 23, 42, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           position: relative; overflow: hidden;
           display: flex; align-items: center; justify-content: center;
+          transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+          backdrop-filter: blur(10px);
+        }
+        .mn-step-visual:hover {
+          border-color: rgba(99, 102, 241, 0.4);
+          transform: scale(1.02);
+          box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+        }
+        .mn-step-visual img {
+          width: 100%; height: 100%; object-fit: cover;
+          opacity: 0.85; transition: opacity 0.5s, transform 0.5s;
+        }
+        .mn-step-visual:hover img {
+          opacity: 1; transform: scale(1.05);
         }
         .mn-step-visual::after {
-          content: ""; position: absolute; width: 150%; height: 150%;
-          background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-          animation: slowRotate 20s linear infinite;
+          content: ""; position: absolute; inset: 0;
+          background: radial-gradient(circle at center, transparent 30%, rgba(3, 7, 18, 0.4) 100%);
+          pointer-events: none;
         }
-        @keyframes slowRotate { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 
         .mn-step-content { flex: 1; }
         .mn-step-index {
@@ -471,6 +527,101 @@ const Index = () => {
         .mn-cta-sub {
           font-size: 1.25rem; color: #cbd5e1; max-width: 600px; margin: 0 auto 3rem;
           line-height: 1.6;
+        }
+
+        /* ── SOLUTIONS GRID ── */
+        .mn-solutions-grid {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem; margin-top: 4rem;
+        }
+        .mn-solution-card {
+          padding: 3.5rem 2.5rem; border-radius: 28px;
+          background: rgba(15, 23, 42, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.04);
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+          backdrop-filter: blur(8px);
+          position: relative; overflow: hidden;
+        }
+        .mn-solution-card::before {
+          content: ""; position: absolute; inset: 0;
+          background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), transparent);
+          opacity: 0; transition: opacity 0.4s;
+        }
+        .mn-solution-card:hover {
+          background: rgba(15, 23, 42, 0.5);
+          border-color: rgba(99, 102, 241, 0.3);
+          transform: translateY(-8px);
+          box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+        }
+        .mn-solution-card:hover::before { opacity: 1; }
+        .mn-solution-card h3 { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+        .mn-solution-card p { color: #94a3b8; font-size: 1rem; line-height: 1.7; position: relative; z-index: 1; }
+
+        /* ── PRICING ── */
+        .mn-pricing-grid {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          gap: 2rem; margin-top: 4rem;
+        }
+        .mn-price-card {
+          padding: 3.5rem 2.5rem; border-radius: 32px;
+          background: rgba(15, 23, 42, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          display: flex; flex-direction: column; gap: 2.5rem;
+          position: relative; overflow: hidden;
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .mn-price-card:hover {
+          transform: translateY(-12px);
+          border-color: rgba(255, 255, 255, 0.15);
+          box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Individual Card Themes */
+        .mn-price-card.starter { border-top: 4px solid #6366f1; }
+        .mn-price-card.pro { border-top: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); }
+        .mn-price-card.enterprise { border-top: 4px solid #8b5cf6; }
+
+        .mn-popular-badge {
+          position: absolute; top: 1.5rem; right: 1.5rem;
+          padding: 0.35rem 1rem; border-radius: 100px;
+          background: #10b981; color: #fff; font-size: 0.75rem; font-weight: 800;
+          text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        
+        .mn-price-header h3 { color: #fff; font-size: 1.75rem; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif; }
+        .mn-price-header p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; }
+        .mn-price-amount { font-size: 3.5rem; font-weight: 800; color: #fff; margin-top: 1.5rem; font-family: 'Space Grotesk', sans-serif; letter-spacing: -2px; }
+        .mn-price-amount span { font-size: 1.25rem; color: #64748b; font-weight: 400; letter-spacing: 0; }
+        
+        .mn-price-features { list-style: none; display: flex; flex-direction: column; gap: 1.25rem; }
+        .mn-price-feature { color: #cbd5e1; font-size: 1rem; display: flex; align-items: flex-start; gap: 1rem; line-height: 1.4; }
+        .mn-price-feature svg { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+        .mn-price-feature.starter-icon svg { color: #6366f1; }
+        .mn-price-feature.pro-icon svg { color: #10b981; }
+        .mn-price-feature.enterprise-icon svg { color: #8b5cf6; }
+
+        /* ── ABOUT ── */
+        .mn-about-content {
+          display: flex; gap: 4rem; align-items: center; margin-top: 4rem;
+        }
+        .mn-about-text { flex: 1; }
+        .mn-about-visual {
+          flex: 1; height: 450px; border-radius: 32px;
+          background: rgba(15, 23, 42, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          overflow: hidden;
+          position: relative;
+        }
+        .mn-about-visual img {
+          width: 100%; height: 100%; object-fit: cover;
+          opacity: 0.8; transition: all 0.5s;
+        }
+        .mn-about-visual:hover img { transform: scale(1.05); opacity: 1; }
+        .mn-about-overlay {
+          position: absolute; bottom: 2rem; left: 2rem;
+          background: rgba(3, 7, 18, 0.6); backdrop-filter: blur(10px);
+          padding: 1rem 1.5rem; border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         /* ── FOOTER ── */
@@ -534,6 +685,7 @@ const Index = () => {
       `}</style>
 
       <div className="mn-page">
+        <div className="mn-spotlight" ref={spotlightRef} />
         {/* ── Navbar ── */}
         <nav className="mn-nav">
           <div className="mn-nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
@@ -543,9 +695,9 @@ const Index = () => {
 
           <div className="mn-nav-links">
             <a className="mn-nav-link" onClick={() => document.getElementById("mn-features").scrollIntoView({ behavior: "smooth" })}>Features</a>
-            <a className="mn-nav-link">Solutions</a>
-            <a className="mn-nav-link">Pricing</a>
-            <a className="mn-nav-link">About</a>
+            <a className="mn-nav-link" onClick={() => document.getElementById("mn-solutions").scrollIntoView({ behavior: "smooth" })}>Solutions</a>
+            <a className="mn-nav-link" onClick={() => document.getElementById("mn-pricing").scrollIntoView({ behavior: "smooth" })}>Pricing</a>
+            <a className="mn-nav-link" onClick={() => document.getElementById("mn-about").scrollIntoView({ behavior: "smooth" })}>About</a>
           </div>
 
           <div className="mn-nav-actions">
@@ -614,62 +766,58 @@ const Index = () => {
         <section id="mn-features" className="mn-section">
           <div className="mn-section-header">
             <span className="mn-section-label">Capabilities</span>
-            <h2 className="mn-section-title">Everything your business needs</h2>
+            <h2 className="mn-section-title">The Operating System for Modern Retail</h2>
             <p className="mn-section-sub">
-              Purpose-built tools that grow with you — from a single shop to a
-              nationwide retail empire.
+              MartNexus provides the architectural foundation for high-velocity retail operations, 
+              integrating financial precision with deep operational intelligence.
             </p>
           </div>
 
           <div className="mn-features-bento">
             <div className="mn-feature-item feat-lg">
-              <div className="mn-feature-icon-wrapper">📦</div>
-              <h3>Real-Time Inventory</h3>
+              <div className="mn-feature-icon-wrapper"><Package className="w-8 h-8 text-indigo-400" /></div>
+              <h3>Intelligent Inventory Control</h3>
               <p>
-                Track every item across all branches with live stock updates,
-                low-stock alerts, and sophisticated batch management. Never miss
-                a sale due to out-of-stock items again.
+                Beyond simple tracking. Automated reorder logic, multi-unit quantity support (KG, Liters, Pieces), 
+                and granular stock movement logs with full audit-ready accuracy.
               </p>
             </div>
             <div className="mn-feature-item feat-md">
-              <div className="mn-feature-icon-wrapper">🏪</div>
-              <h3>Multi-Branch POS</h3>
+              <div className="mn-feature-icon-wrapper"><FileText className="w-8 h-8 text-cyan-400" /></div>
+              <h3>GST-Compliant POS Engine</h3>
               <p>
-                A lightning-fast point-of-sale experience across unlimited
-                branches with robust offline support.
+                Engineered for speed and compliance. Full support for CGST, SGST, and IGST calculations.
               </p>
             </div>
             <div className="mn-feature-item feat-md">
-              <div className="mn-feature-icon-wrapper">📊</div>
-              <h3>Advanced Analytics</h3>
+              <div className="mn-feature-icon-wrapper"><BarChart3 className="w-8 h-8 text-purple-400" /></div>
+              <h3>Strategic Growth Analytics</h3>
               <p>
-                Deep sales insights and interactive dashboards to drive smarter,
-                data-backed business decisions.
+                Dynamic sales analysis and performance monitoring. Translate transaction data 
+                into actionable growth strategies.
               </p>
             </div>
             <div className="mn-feature-item feat-lg">
-              <div className="mn-feature-icon-wrapper">🔐</div>
-              <h3>Role-Based Access</h3>
+              <div className="mn-feature-icon-wrapper"><ShieldCheck className="w-8 h-8 text-indigo-400" /></div>
+              <h3>Enterprise Security & Auditing</h3>
               <p>
-                Granular permissions for admins, managers, and staff with
-                complete audit logging for total transparency. Secure your
-                operations with enterprise-grade security protocols.
+                Complete financial accountability with full audit trails (AuditLog) of every record change. 
+                Role-based permissions and encrypted transaction logging.
               </p>
             </div>
             <div className="mn-feature-item feat-sm">
-              <div className="mn-feature-icon-wrapper">🧾</div>
-              <h3>Smart Invoicing</h3>
+              <div className="mn-feature-icon-wrapper"><Settings2 className="w-8 h-8 text-cyan-400" /></div>
+              <h3>Procurement Automation</h3>
               <p>
-                Generate professional invoices and receipts instantly. Full PDF
-                export and integrated barcode support for seamless checkout.
+                End-to-end supply chain management with Purchase Order tracking and supplier management.
               </p>
             </div>
             <div className="mn-feature-item feat-sm">
-              <div className="mn-feature-icon-wrapper">🔔</div>
-              <h3>Instant Notifications</h3>
+              <div className="mn-feature-icon-wrapper"><PlusCircle className="w-8 h-8 text-purple-400" /></div>
+              <h3>Automated Data Resilience</h3>
               <p>
-                Stay informed with real-time push alerts for low stock, new
-                orders, and critical operational events across your empire.
+                Peace of mind with scheduled database and inventory backups. 
+                Full recovery protocols ensuring zero downtime.
               </p>
             </div>
           </div>
@@ -679,10 +827,10 @@ const Index = () => {
         <section className="mn-section" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <div className="mn-section-header">
             <span className="mn-section-label">Process</span>
-            <h2 className="mn-section-title">Up and running in minutes</h2>
+            <h2 className="mn-section-title">Institutional deployment in minutes</h2>
             <p className="mn-section-sub">
-              No complicated setup. No steep learning curve. Just a powerful
-              system ready to dominate the market.
+              MartNexus is designed for rapid onboarding. Transition from legacy spreadsheets 
+              to enterprise intelligence without the operational downtime.
             </p>
           </div>
 
@@ -690,42 +838,175 @@ const Index = () => {
             <div className="mn-modern-step">
               <div className="mn-step-content">
                 <div className="mn-step-index">01</div>
-                <h3>Create your account</h3>
+                <h3>Configure Identity & Security</h3>
                 <p>
-                  Sign up in seconds with just your email. No credit card
-                  required to explore the full power of MartNexus.
+                  Initialize your enterprise profile and secure your credentials. 
+                  MartNexus employs industrial-grade encryption for all user and shop data.
                 </p>
               </div>
               <div className="mn-step-visual">
-                <div style={{ fontSize: "4rem" }}>⚡</div>
+                <img src="/security_step.png" alt="Security & Identity" />
               </div>
             </div>
 
             <div className="mn-modern-step" style={{ flexDirection: "row-reverse" }}>
               <div className="mn-step-content">
                 <div className="mn-step-index">02</div>
-                <h3>Add your shop & products</h3>
+                <h3>Synchronize Inventory & Supply Chain</h3>
                 <p>
-                  Configure branches, add inventory items, set prices and
-                  categories with an intuitive, drag-and-drop interface.
+                  Import existing product catalogs, configure tax categories, and link suppliers. 
+                  Our intelligent mapper handles complex SKU structures automatically.
                 </p>
               </div>
               <div className="mn-step-visual">
-                <div style={{ fontSize: "4rem" }}>🏪</div>
+                <img src="/inventory_step.png" alt="Supply Chain Sync" />
               </div>
             </div>
 
             <div className="mn-modern-step">
               <div className="mn-step-content">
                 <div className="mn-step-index">03</div>
-                <h3>Sell, track & scale</h3>
+                <h3>Execute & Analyze</h3>
                 <p>
-                  Use the POS to process sales, monitor stock in real time, and
-                  export detailed reports to scale your business.
+                  Go live with our lightning-fast POS. Monitor real-time stock movements and 
+                  leverage automated audit logs to maintain total operational control.
                 </p>
               </div>
               <div className="mn-step-visual">
-                <div style={{ fontSize: "4rem" }}>🚀</div>
+                <img src="/analytics_step.png" alt="Execute & Analyze" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Solutions (Verticals) ── */}
+        <section id="mn-solutions" className="mn-section">
+          <div className="mn-section-header">
+            <span className="mn-section-label">Solutions</span>
+            <h2 className="mn-section-title">Modular. Industry-Specific.</h2>
+            <p className="mn-section-sub">
+              Our architecture adapts to the specialized requirements of your 
+              vertical, ensuring zero friction and maximum compliance.
+            </p>
+          </div>
+
+          <div className="mn-solutions-grid">
+            <div className="mn-solution-card">
+              <h3><PlusCircle className="w-6 h-6 text-red-400" /> Pharmaceutical Retail</h3>
+              <p>Batch-level tracking and expiry alerts. Maintain strict health regulatory compliance and safety standards with automated logging.</p>
+            </div>
+            <div className="mn-solution-card">
+              <h3><ShoppingBag className="w-6 h-6 text-pink-400" /> Fashion & Lifestyle</h3>
+              <p>Multi-variant SKU management. Handle thousands of style, size, and color combinations with integrated inventory logic.</p>
+            </div>
+            <div className="mn-solution-card">
+              <h3><Cpu className="w-6 h-6 text-blue-400" /> Electronics & Appliances</h3>
+              <p>Serial number tracking and precision warranty management. Protect high-value assets with unique identifier logging.</p>
+            </div>
+            <div className="mn-solution-card">
+              <h3><ShoppingCart className="w-6 h-6 text-emerald-400" /> Grocery & Perishables</h3>
+              <p>High-velocity POS and FIFO-based stock management. Optimize shelf-life and maximize operational throughput daily.</p>
+            </div>
+            <div className="mn-solution-card">
+              <h3><Wine className="w-6 h-6 text-purple-400" /> Wine & Specialty Spirits</h3>
+              <p>Sophisticated cataloging and customer-specific pricing structures for unique, high-engagement retail environments.</p>
+            </div>
+            <div className="mn-solution-card">
+              <h3><Settings2 className="w-6 h-6 text-orange-400" /> Industrial & Hardware</h3>
+              <p>Bulk purchasing logic and precision bin tracking. Scale your industrial supply chain with automated reorder levels.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Pricing ── */}
+        <section id="mn-pricing" className="mn-section" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="mn-section-header" style={{ margin: "0 auto 5rem", textAlign: "center" }}>
+            <span className="mn-section-label" style={{ justifyContent: "center" }}>Strategic Investment</span>
+            <h2 className="mn-section-title">Predictable Pricing. Infinite Scale.</h2>
+            <p className="mn-section-sub" style={{ margin: "0 auto" }}>
+              Invest in a system that scales with your ambition. No hidden overheads, 
+              just pure operational power for your retail empire.
+            </p>
+          </div>
+
+          <div className="mn-pricing-grid">
+            {/* Starter Plan */}
+            <div className="mn-price-card starter">
+              <div className="mn-price-header">
+                <h3>Starter</h3>
+                <p>The foundation for independent boutiques and shops</p>
+                <div className="mn-price-amount">$29<span>/mo</span></div>
+              </div>
+              <ul className="mn-price-features">
+                <li className="mn-price-feature starter-icon"><CheckIcon /> Full Inventory & POS Engine</li>
+                <li className="mn-price-feature starter-icon"><CheckIcon /> GST-Ready Invoicing (PDF)</li>
+                <li className="mn-price-feature starter-icon"><CheckIcon /> Up to 5,000 Products</li>
+                <li className="mn-price-feature starter-icon"><CheckIcon /> Daily Automated Backups</li>
+                <li className="mn-price-feature starter-icon"><CheckIcon /> Standard Email Support</li>
+              </ul>
+              <button className="mn-btn-cta-ghost" style={{ width: "100%", marginTop: "auto" }} onClick={() => navigate("/auth")}>Get Started</button>
+            </div>
+
+            {/* Professional Plan */}
+            <div className="mn-price-card pro">
+              <div className="mn-popular-badge">Best for Growth</div>
+              <div className="mn-price-header">
+                <h3>Professional</h3>
+                <p>The institutional standard for multi-branch retail</p>
+                <div className="mn-price-amount">$79<span>/mo</span></div>
+              </div>
+              <ul className="mn-price-features">
+                <li className="mn-price-feature pro-icon"><CheckIcon /> Multi-Branch Syncing (Up to 10)</li>
+                <li className="mn-price-feature pro-icon"><CheckIcon /> Advanced Procurement (Purchase Orders)</li>
+                <li className="mn-price-feature pro-icon"><CheckIcon /> Customer Loyalty & CRM Engine</li>
+                <li className="mn-price-feature pro-icon"><CheckIcon /> Real-time Analytics Dashboard</li>
+                <li className="mn-price-feature pro-icon"><CheckIcon /> Priority 24/7 Technical Support</li>
+              </ul>
+              <button className="mn-btn-cta-primary" style={{ width: "100%", marginTop: "auto" }} onClick={() => navigate("/auth")}>Scale Enterprise</button>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="mn-price-card enterprise">
+              <div className="mn-price-header">
+                <h3>Enterprise</h3>
+                <p>Custom infrastructure for nationwide empires</p>
+                <div className="mn-price-amount">Custom</div>
+              </div>
+              <ul className="mn-price-features">
+                <li className="mn-price-feature enterprise-icon"><CheckIcon /> Unlimited Branches & Scale</li>
+                <li className="mn-price-feature enterprise-icon"><CheckIcon /> Full Audit Log & Compliance Access</li>
+                <li className="mn-price-feature enterprise-icon"><CheckIcon /> Custom API & ERP Integrations</li>
+                <li className="mn-price-feature enterprise-icon"><CheckIcon /> Dedicated Success Manager</li>
+                <li className="mn-price-feature enterprise-icon"><CheckIcon /> On-site Onboarding & Training</li>
+              </ul>
+              <button className="mn-btn-cta-ghost" style={{ width: "100%", marginTop: "auto" }} onClick={() => navigate("/auth")}>Contact Strategy Team</button>
+            </div>
+          </div>
+        </section>
+
+        {/* ── About ── */}
+        <section id="mn-about" className="mn-section" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+          <div className="mn-about-content">
+            <div className="mn-about-text">
+              <span className="mn-section-label">Our Philosophy</span>
+              <h2 className="mn-section-title">Redefining Retail Intelligence</h2>
+              <p className="mn-section-sub" style={{ marginBottom: "2rem" }}>
+                MartNexus was founded to solve a critical market failure: the gap 
+                between high-end enterprise ERPs and simple POS apps. We provide 
+                the world's most intuitive and powerful retail operating system.
+              </p>
+              <p className="mn-section-sub">
+                Our team of engineers, data scientists, and retail veterans work 
+                to ensure your business is always one step ahead, utilizing 
+                modern cloud architecture to protect your financial and operational 
+                integrity globally.
+              </p>
+            </div>
+            <div className="mn-about-visual">
+              <img src="/about_visual.png" alt="Global Retail Network" />
+              <div className="mn-about-overlay">
+                <div style={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem" }}>Global Intelligence Network</div>
+                <div style={{ color: "#94a3b8", fontSize: "0.85rem", marginTop: "0.25rem" }}>Real-time synchronization across 50+ countries</div>
               </div>
             </div>
           </div>
