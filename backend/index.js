@@ -32,7 +32,14 @@ const port = process.env.PORT || 5000;
 
 // Perfect CORS Handling
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://mart-nexus-frontend.vercel.app'],
+    origin: [
+        'http://localhost:3000', 
+        'http://localhost:5173', 
+        'http://127.0.0.1:3000', 
+        'http://127.0.0.1:5173',
+        'https://martnexus.vercel.app',
+        'https://mart-nexus-frontend.vercel.app'
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
