@@ -38,6 +38,7 @@ app.use(cors({
         'http://127.0.0.1:3000', 
         'http://127.0.0.1:5173',
         'https://martnexus.vercel.app',
+        'https://mart-nexus.vercel.app',
         'https://mart-nexus-frontend.vercel.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
