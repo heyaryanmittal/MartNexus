@@ -878,37 +878,37 @@ const Index = () => {
         <section id="mn-solutions" className="mn-section">
           <div className="mn-section-header">
             <span className="mn-section-label">Solutions</span>
-            <h2 className="mn-section-title">Modular. Industry-Specific.</h2>
+            <h2 className="mn-section-title">Engineered for Every Vertical.</h2>
             <p className="mn-section-sub">
-              Our architecture adapts to the specialized requirements of your 
-              vertical, ensuring zero friction and maximum compliance.
+              MartNexus is a vertical-agnostic powerhouse, engineered to handle the 
+              complexities of any inventory-driven business, anywhere in the world.
             </p>
           </div>
 
           <div className="mn-solutions-grid">
             <div className="mn-solution-card">
-              <h3><PlusCircle className="w-6 h-6 text-red-400" /> Pharmaceutical Retail</h3>
-              <p>Batch-level tracking and expiry alerts. Maintain strict health regulatory compliance and safety standards with automated logging.</p>
+              <h3><ShoppingBag className="w-6 h-6 text-indigo-400" /> Dynamic Retail</h3>
+              <p>From independent boutiques to massive supermarkets. Seamlessly manage stock across infinite physical and digital storefronts with real-time sync.</p>
             </div>
             <div className="mn-solution-card">
-              <h3><ShoppingBag className="w-6 h-6 text-pink-400" /> Fashion & Lifestyle</h3>
-              <p>Multi-variant SKU management. Handle thousands of style, size, and color combinations with integrated inventory logic.</p>
+              <h3><Settings2 className="w-6 h-6 text-cyan-400" /> Industrial Supply</h3>
+              <p>Robust tracking for heavy equipment, hardware, and bulk logistics. Handle complex SKU structures and wholesale procurement at scale.</p>
             </div>
             <div className="mn-solution-card">
-              <h3><Cpu className="w-6 h-6 text-blue-400" /> Electronics & Appliances</h3>
-              <p>Serial number tracking and precision warranty management. Protect high-value assets with unique identifier logging.</p>
+              <h3><ShieldCheck className="w-6 h-6 text-emerald-400" /> Precision Healthcare</h3>
+              <p>Regulatory-compliant inventory for pharmacies, labs, and clinical providers. Maintain strict batch tracking and expiry control with automated alerts.</p>
             </div>
             <div className="mn-solution-card">
-              <h3><ShoppingCart className="w-6 h-6 text-emerald-400" /> Grocery & Perishables</h3>
-              <p>High-velocity POS and FIFO-based stock management. Optimize shelf-life and maximize operational throughput daily.</p>
+              <h3><Cpu className="w-6 h-6 text-blue-400" /> High-Tech & Luxury</h3>
+              <p>Custom logic for high-value assets, electronics, and specialized goods. Precision warranty management and unique identifier (IMEA/Serial) tracking.</p>
             </div>
             <div className="mn-solution-card">
-              <h3><Wine className="w-6 h-6 text-purple-400" /> Wine & Specialty Spirits</h3>
-              <p>Sophisticated cataloging and customer-specific pricing structures for unique, high-engagement retail environments.</p>
+              <h3><ShoppingCart className="w-6 h-6 text-purple-400" /> High-Velocity FMCG</h3>
+              <p>Optimized for perishables and fast-moving consumer goods. Implement FIFO-based management to maximize turnover and minimize waste.</p>
             </div>
             <div className="mn-solution-card">
-              <h3><Settings2 className="w-6 h-6 text-orange-400" /> Industrial & Hardware</h3>
-              <p>Bulk purchasing logic and precision bin tracking. Scale your industrial supply chain with automated reorder levels.</p>
+              <h3><BarChart3 className="w-6 h-6 text-orange-400" /> Global Distribution</h3>
+              <p>Real-time synchronization for wholesalers and multi-warehouse operations. Unify your entire supply chain under a single, intelligent dashboard.</p>
             </div>
           </div>
         </section>
@@ -999,10 +999,6 @@ const Index = () => {
             </div>
             <div className="mn-about-visual">
               <img src="/about_visual.png" alt="Global Retail Network" />
-              <div className="mn-about-overlay">
-                <div style={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem" }}>Global Intelligence Network</div>
-                <div style={{ color: "#94a3b8", fontSize: "0.85rem", marginTop: "0.25rem" }}>Real-time synchronization across 50+ countries</div>
-              </div>
             </div>
           </div>
         </section>
