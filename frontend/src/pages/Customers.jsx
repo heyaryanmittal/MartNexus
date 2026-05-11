@@ -17,10 +17,10 @@ const Customers = () => {
         setIsFormOpen(false);
         setEditingCustomer(null);
     };
-    return (<div className="space-y-6">
+    return (<div className="space-y-4 sm:space-y-6 pb-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Customers</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Manage customer profiles, pricing, and view purchase history
         </p>
       </div>

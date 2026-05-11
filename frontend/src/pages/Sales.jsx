@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search, Receipt, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -26,26 +26,17 @@ export default function Sales() {
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [dateRange, setDateRange] = useState({});
-  const [sales, setSales] = useState([]);
   const [selectedSale, setSelectedSale] = useState(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [saleToCancel, setSaleToCancel] = useState(null);
-  const { fetchSales, cancelSale, loading } = useSales();
 
-  useEffect(() => {
-    loadSales();
-  }, [dateRange]);
+  const { sales, loading, cancelSale, refetch } = useSales({
+    startDate: dateRange.from ? startOfDay(dateRange.from).toISOString() : undefined,
+    endDate: dateRange.to ? endOfDay(dateRange.to).toISOString() : undefined,
+  });
 
-  const loadSales = async () => {
-    try {
-      const startDate = dateRange.from ? startOfDay(dateRange.from).toISOString() : undefined;
-      const endDate = dateRange.to ? endOfDay(dateRange.to).toISOString() : undefined;
-      const data = await fetchSales({ startDate, endDate });
-      setSales(data || []);
-    }
-    catch (error) {
-      console.error('Error loading sales:', error);
-    }
+  const loadSales = () => {
+    refetch();
   };
 
   const handleCancelSale = (sale) => {
@@ -66,14 +57,11 @@ export default function Sales() {
     }
   };
 
-  const filteredSales = sales.filter(sale => {
+  const filteredSales = (sales || []).filter(sale => {
     const matchesSearch = (sale.billNumber || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (sale.notes || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (sale.customerName || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-    
-    
-    
     let backendMode = (sale.paymentMode || '').toLowerCase();
     if (backendMode === 'net_banking') backendMode = 'card';
     if (backendMode === 'upi') backendMode = 'mobile';
@@ -109,7 +97,7 @@ export default function Sales() {
 
     <Card className="p-3 sm:p-4">
       <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 sm:items-center">
-        <div className="relative flex-1 min-w-[250px]">
+        <div className="relative flex-1 min-w-0 sm:min-w-[250px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Search by sale number or notes..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
         </div>

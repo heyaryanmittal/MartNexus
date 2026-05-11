@@ -12,30 +12,30 @@ export const RoleGuard = ({ children, allowedRoles, fallback = null }) => {
 
 export const PERMISSIONS = {
     
-    VIEW_DASHBOARD: ['admin', 'manager', 'cashier'],
+    VIEW_DASHBOARD: ['admin', 'manager', 'cashier', 'user'],
     
-    USE_POS: ['admin', 'manager', 'cashier'],
-    APPLY_DISCOUNTS: ['admin', 'manager'],
+    USE_POS: ['admin', 'manager', 'cashier', 'user'],
+    APPLY_DISCOUNTS: ['admin', 'manager', 'user'],
     
-    VIEW_PRODUCTS: ['admin', 'manager', 'cashier'],
-    MANAGE_PRODUCTS: ['admin', 'manager'],
+    VIEW_PRODUCTS: ['admin', 'manager', 'cashier', 'user'],
+    MANAGE_PRODUCTS: ['admin', 'manager', 'user'],
     
-    VIEW_INVENTORY: ['admin', 'manager', 'cashier'],
-    MANAGE_INVENTORY: ['admin', 'manager'],
+    VIEW_INVENTORY: ['admin', 'manager', 'cashier', 'user'],
+    MANAGE_INVENTORY: ['admin', 'manager', 'user'],
     
-    VIEW_SALES: ['admin', 'manager'],
-    VIEW_OWN_SALES: ['admin', 'manager', 'cashier'],
+    VIEW_SALES: ['admin', 'manager', 'user'],
+    VIEW_OWN_SALES: ['admin', 'manager', 'cashier', 'user'],
     
-    VIEW_REPORTS: ['admin', 'manager'],
-    VIEW_FINANCIAL_REPORTS: ['admin'],
+    VIEW_REPORTS: ['admin', 'manager', 'user'],
+    VIEW_FINANCIAL_REPORTS: ['admin', 'user'],
     
-    VIEW_SUPPLIERS: ['admin', 'manager'],
-    MANAGE_SUPPLIERS: ['admin', 'manager'],
+    VIEW_SUPPLIERS: ['admin', 'manager', 'user'],
+    MANAGE_SUPPLIERS: ['admin', 'manager', 'user'],
     
-    VIEW_CUSTOMERS: ['admin', 'manager', 'cashier'],
-    MANAGE_CUSTOMERS: ['admin', 'manager'],
+    VIEW_CUSTOMERS: ['admin', 'manager', 'cashier', 'user'],
+    MANAGE_CUSTOMERS: ['admin', 'manager', 'user'],
     
-    MANAGE_USERS: ['admin'],
+    MANAGE_USERS: ['admin', 'user'],
     
-    MANAGE_SETTINGS: ['admin'],
+    MANAGE_SETTINGS: ['admin', 'user'],
 };

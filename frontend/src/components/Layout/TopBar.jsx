@@ -51,12 +51,12 @@ export function TopBar() {
   };
 
   return (
-    <header className="h-16 border-b bg-card flex items-center justify-between px-6">
-      <div className="flex items-center gap-4">
+    <header className="h-16 border-b bg-card flex items-center justify-between px-4 md:px-6">
+      <div className="flex items-center gap-2 sm:gap-4">
         <SidebarTrigger />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-[200px] justify-between">
+            <Button variant="outline" className="w-[140px] sm:w-[200px] justify-between">
               <div className="flex items-center truncate">
                 <Store className="mr-2 h-4 w-4" />
                 <span className="truncate">{activeShop?.name || "Select Shop"}</span>
@@ -88,7 +88,7 @@ export function TopBar() {
         <CreateShopModal open={createShopOpen} onOpenChange={setCreateShopOpen} />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <Button variant="ghost" size="icon">
           <Bell className="h-5 w-5" />
         </Button>

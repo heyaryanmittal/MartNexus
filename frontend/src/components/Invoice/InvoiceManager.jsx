@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,11 +14,10 @@ import { useShop } from '@/hooks/useShop';
 import { format } from 'date-fns';
 
 export function InvoiceManager() {
-  const [invoices, setInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const { fetchSales, loading: isLoading } = useSales();
+  const { sales: invoices, loading: isLoading } = useSales();
   const { toast } = useToast();
 
   const { shop } = useShop();
@@ -35,25 +34,6 @@ export function InvoiceManager() {
     stateCode: "-"
   } : null;
 
-  
-  useEffect(() => {
-    loadInvoices();
-  }, []);
-
-  const loadInvoices = async () => {
-    try {
-      const data = await fetchSales();
-      setInvoices(data || []);
-    } catch (error) {
-      console.error('Error loading invoices:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load invoices from server",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleViewInvoice = (invoice) => {
     setSelectedInvoice(invoice);
     setIsInvoiceModalOpen(true);
@@ -69,7 +49,7 @@ export function InvoiceManager() {
     setIsInvoiceModalOpen(true);
   };
 
-  const filteredInvoices = invoices.filter(invoice =>
+  const filteredInvoices = (invoices || []).filter(invoice =>
     invoice.billNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     invoice.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     invoice.paymentMode?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -102,22 +82,20 @@ export function InvoiceManager() {
     return variants[mode] || 'default';
   };
 
-
-
   return (
-    <div className="space-y-6">
-      {}
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 pb-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Invoice Management</h1>
-          <p className="text-muted-foreground">View, print, and download your invoices</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Invoice Management</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">View, print, and download your invoices</p>
         </div>
-        <Badge variant="outline" className="text-sm">
-          {invoices.length} Total Invoices
+        <Badge variant="outline" className="text-sm w-fit">
+          {(invoices || []).length} Total Invoices
         </Badge>
       </div>
 
-      {}
+      {/* Search */}
       <Card>
         <CardContent className="pt-6">
           <div className="relative">
@@ -132,10 +110,10 @@ export function InvoiceManager() {
         </CardContent>
       </Card>
 
-      {}
+      {/* Invoice List */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <FileText className="h-5 w-5" />
             Recent Invoices
           </CardTitle>
@@ -150,21 +128,21 @@ export function InvoiceManager() {
           ) : (
             <div className="space-y-4">
               {filteredInvoices.map((invoice) => (
-                <div key={invoice.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-semibold text-lg">#{invoice.billNumber}</span>
+                <div key={invoice.id} className="border rounded-lg p-3 sm:p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <span className="font-semibold text-base sm:text-lg">#{invoice.billNumber}</span>
                         <Badge variant={getPaymentBadgeVariant(invoice.paymentMode)}>
                           {getPaymentModeDisplay(invoice.paymentMode)}
                         </Badge>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(invoice.createdAt)}
+                          <Calendar className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{formatDate(invoice.createdAt)}</span>
                         </div>
-                        <div>
+                        <div className="truncate">
                           Customer: <span className="font-medium text-foreground">{invoice.customerName}</span>
                         </div>
                         <div>
@@ -172,13 +150,13 @@ export function InvoiceManager() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <div className="text-lg font-bold">₹{Number(invoice.totalAmount).toFixed(2)}</div>
                       <div className="text-xs text-muted-foreground">incl. GST ₹{Number(invoice.taxAmount).toFixed(2)}</div>
                     </div>
                   </div>
                   <Separator className="my-3" />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       variant="outline"
                       size="sm"
@@ -211,7 +189,7 @@ export function InvoiceManager() {
         </CardContent>
       </Card>
 
-      {}
+      {/* Invoice Modal */}
       <Dialog open={isInvoiceModalOpen} onOpenChange={setIsInvoiceModalOpen}>
         <GSTInvoice
           open={isInvoiceModalOpen}
@@ -223,4 +201,3 @@ export function InvoiceManager() {
     </div>
   );
 }
-

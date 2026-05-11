@@ -19,6 +19,7 @@ const dashboardRoutes = require('./src/routes/dashboardRoutes');
 const supplierRoutes = require('./src/routes/supplierRoutes');
 const purchaseOrderRoutes = require('./src/routes/purchaseOrderRoutes');
 const customerRoutes = require('./src/routes/customerRoutes');
+
 const cronRoutes = require('./src/routes/cronRoutes');
 
 
@@ -62,6 +63,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/purchase-orders', purchaseOrderRoutes);
 app.use('/api/customers', customerRoutes);
+
 app.use('/api/cron', cronRoutes);
 
 

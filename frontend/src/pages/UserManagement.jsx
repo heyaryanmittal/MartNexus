@@ -88,10 +88,10 @@ export default function UserManagement() {
     if (!isAdmin) {
         return <Navigate to="/dashboard" replace/>;
     }
-    return (<div className="space-y-6">
+    return (<div className="space-y-4 sm:space-y-6 pb-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">User Management</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Manage user accounts and assign roles
         </p>
       </div>
@@ -105,7 +105,7 @@ export default function UserManagement() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 border rounded-lg">
               <Badge className={ROLE_COLORS.admin}>Admin</Badge>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -137,7 +137,7 @@ export default function UserManagement() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (<div className="text-center py-8 text-muted-foreground">Loading users...</div>) : users.length === 0 ? (<div className="text-center py-8 text-muted-foreground">No users found</div>) : (<Table>
+          {isLoading ? (<div className="text-center py-8 text-muted-foreground">Loading users...</div>) : users.length === 0 ? (<div className="text-center py-8 text-muted-foreground">No users found</div>) : (<div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
@@ -198,7 +198,7 @@ export default function UserManagement() {
                     </TableCell>
                   </TableRow>))}
               </TableBody>
-            </Table>)}
+            </Table></div>)}
         </CardContent>
       </Card>
     </div>);

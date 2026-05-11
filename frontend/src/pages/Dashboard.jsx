@@ -78,12 +78,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-3 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">
               Dashboard
             </h1>
             <div className="flex items-center gap-2 text-gray-600">
@@ -112,7 +112,7 @@ export default function Dashboard() {
             <Store className="w-16 h-16 mx-auto text-gray-400 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No Shop Selected</h3>
             <p className="text-gray-600 mb-6">Please select a shop from the sidebar to view dashboard</p>
-            <Button onClick={() => navigate('/my-shops')} className="bg-blue-500 hover:bg-blue-600">
+            <Button onClick={() => navigate('/shops')} className="bg-blue-500 hover:bg-blue-600">
               Go to My Shops
             </Button>
           </Card>

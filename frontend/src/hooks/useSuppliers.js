@@ -1,188 +1,106 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { useStore } from '../store/useStore';
 
 export function useSuppliers() {
-    const [suppliers, setSuppliers] = useState([]);
-    const [supplierProducts, setSupplierProducts] = useState([]);
-    const [purchaseOrders, setPurchaseOrders] = useState([]);
-    const [loading, setLoading] = useState(false);
     const { toast } = useToast();
     const { activeShop } = useStore();
+    const queryClient = useQueryClient();
 
-    const fetchSuppliers = useCallback(async () => {
-        if (!activeShop?.id) return [];
-        setLoading(true);
-        try {
-            const { data } = await api.get('/suppliers', {
-                params: { shopId: activeShop.id }
-            });
-            setSuppliers(data || []);
+    const { data: suppliers = [], isLoading: suppliersLoading, refetch: fetchSuppliers } = useQuery({
+        queryKey: ['suppliers', activeShop?.id],
+        queryFn: async () => {
+            if (!activeShop?.id) return [];
+            const { data } = await api.get('/suppliers', { params: { shopId: activeShop.id } });
             return data || [];
-        } catch (error) {
-            console.error('Error fetching suppliers:', error);
-            toast({ title: 'Error fetching suppliers', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    }, [activeShop?.id, toast]);
+        },
+        enabled: !!activeShop?.id,
+    });
 
-    const createSupplier = useCallback(async (supplier) => {
-        if (!activeShop?.id) return null;
-        try {
-            const { data } = await api.post('/suppliers', {
-                ...supplier,
-                shopId: activeShop.id
-            });
+    const { data: purchaseOrders = [], isLoading: poLoading, refetch: fetchPurchaseOrders } = useQuery({
+        queryKey: ['purchase-orders', activeShop?.id],
+        queryFn: async () => {
+            if (!activeShop?.id) return [];
+            const { data } = await api.get('/purchase-orders', { params: { shopId: activeShop.id } });
+            return data || [];
+        },
+        enabled: !!activeShop?.id,
+    });
+
+    const createSupplierMutation = useMutation({
+        mutationFn: (supplier) => api.post('/suppliers', { ...supplier, shopId: activeShop.id }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['suppliers', activeShop?.id] });
             toast({ title: 'Supplier created successfully' });
-            return data;
-        } catch (error) {
-            toast({ title: 'Error creating supplier', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return null;
-        }
-    }, [activeShop?.id, toast]);
+        },
+        onError: (error) => toast({ title: 'Error creating supplier', description: error.response?.data?.error || error.message, variant: 'destructive' }),
+    });
 
-    const updateSupplier = useCallback(async (id, updates) => {
-        try {
-            await api.put(`/suppliers/${id}`, updates);
+    const updateSupplierMutation = useMutation({
+        mutationFn: ({ id, updates }) => api.put(`/suppliers/${id}`, updates),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['suppliers', activeShop?.id] });
             toast({ title: 'Supplier updated successfully' });
-            return true;
-        } catch (error) {
-            toast({ title: 'Error updating supplier', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return false;
-        }
-    }, [toast]);
+        },
+        onError: (error) => toast({ title: 'Error updating supplier', description: error.response?.data?.error || error.message, variant: 'destructive' }),
+    });
 
-    const deleteSupplier = useCallback(async (id) => {
-        try {
-            await api.delete(`/suppliers/${id}`);
+    const deleteSupplierMutation = useMutation({
+        mutationFn: (id) => api.delete(`/suppliers/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['suppliers', activeShop?.id] });
             toast({ title: 'Supplier deleted successfully' });
-            return true;
-        } catch (error) {
-            toast({ title: 'Error deleting supplier', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return false;
-        }
-    }, [toast]);
+        },
+        onError: (error) => toast({ title: 'Error deleting supplier', description: error.response?.data?.error || error.message, variant: 'destructive' }),
+    });
 
-    const fetchSupplierProducts = useCallback(async (supplierId) => {
-        try {
-            const { data } = await api.get(`/suppliers/${supplierId}/products`);
-            setSupplierProducts(data); 
-            return data;
-        } catch (error) {
-            console.error('Error fetching supplier products:', error);
-            return [];
-        }
-    }, []);
-
-    const linkProductToSupplier = useCallback(async (supplierId, productId, costPrice, supplierSku, isPreferred) => {
-        try {
-            await api.post(`/suppliers/${supplierId}/products`, {
-                productId,
-                costPrice,
-                supplierSku,
-                isPreferred
-            });
-            toast({ title: 'Product linked successfully' });
-            return true;
-        } catch (error) {
-            console.error('Error linking product:', error);
-            toast({ title: 'Failed to link product', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return false;
-        }
-    }, [toast]);
-
-    const unlinkProduct = useCallback(async (id) => {
-        try {
-            await api.delete(`/suppliers/products/${id}`);
-            toast({ title: 'Product unlinked successfully' });
-            return true;
-        } catch (error) {
-            console.error('Error unlinking product:', error);
-            toast({ title: 'Failed to unlink product', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return false;
-        }
-    }, [toast]);
-
-    const fetchPurchaseOrders = useCallback(async () => {
-        if (!activeShop?.id) return [];
-        setLoading(true);
-        try {
-            const { data } = await api.get('/purchase-orders', {
-                params: { shopId: activeShop.id }
-            });
-            setPurchaseOrders(data || []);
-            return data || [];
-        } catch (error) {
-            toast({ title: 'Error fetching purchase orders', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    }, [activeShop?.id, toast]);
-
-    const fetchPurchaseOrderItems = useCallback(async (poId) => {
-        
-        try {
-            const { data } = await api.get(`/purchase-orders/${poId}/items`);
-            return data || [];
-        } catch (error) {
-            return [];
-        }
-    }, [toast]);
-
-    const createPurchaseOrder = useCallback(async (supplierId, items, expectedDelivery, notes) => {
-        if (!activeShop?.id) return null;
-        try {
-            const payload = {
-                shopId: activeShop.id,
-                supplier_id: supplierId,
-                items: items.map(item => ({
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    costPrice: item.unitCost
-                })),
-                expected_delivery_date: expectedDelivery,
-                notes
-            };
-            console.log("Sending PO Payload:", payload);
-            const { data } = await api.post('/purchase-orders', payload);
+    const createPOMutation = useMutation({
+        mutationFn: (payload) => api.post('/purchase-orders', payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['purchase-orders', activeShop?.id] });
             toast({ title: 'Purchase order created successfully' });
-            return data;
-        } catch (error) {
-            toast({ title: 'Error creating purchase order', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return null;
-        }
-    }, [activeShop?.id, toast]);
+        },
+        onError: (error) => toast({ title: 'Error creating purchase order', description: error.response?.data?.error || error.message, variant: 'destructive' }),
+    });
 
-    const updatePurchaseOrderStatus = useCallback(async (id, status) => {
-        try {
-            await api.patch(`/purchase-orders/${id}/status`, { status });
-            toast({ title: `Purchase order ${status}` });
-            return true;
-        } catch (error) {
-            toast({ title: 'Error updating status', description: error.response?.data?.error || error.message, variant: 'destructive' });
-            return false;
-        }
-    }, [toast]);
+    const updatePOStatusMutation = useMutation({
+        mutationFn: ({ id, status }) => api.patch(`/purchase-orders/${id}/status`, { status }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['purchase-orders', activeShop?.id] });
+            toast({ title: `Purchase order updated` });
+        },
+    });
 
     return {
         suppliers,
-        supplierProducts,
         purchaseOrders,
-        loading,
+        loading: suppliersLoading || poLoading,
         fetchSuppliers,
-        createSupplier,
-        updateSupplier,
-        deleteSupplier,
-        fetchSupplierProducts,
-        linkProductToSupplier,
-        unlinkProduct,
+        createSupplier: createSupplierMutation.mutateAsync,
+        updateSupplier: (id, updates) => updateSupplierMutation.mutateAsync({ id, updates }),
+        deleteSupplier: deleteSupplierMutation.mutateAsync,
         fetchPurchaseOrders,
-        fetchPurchaseOrderItems,
-        createPurchaseOrder,
-        updatePurchaseOrderStatus
+        createPurchaseOrder: (supplierId, items, expectedDelivery, notes) => 
+            createPOMutation.mutateAsync({
+                shopId: activeShop.id,
+                supplier_id: supplierId,
+                items: items.map(item => ({ productId: item.productId, quantity: item.quantity, costPrice: item.unitCost })),
+                expected_delivery_date: expectedDelivery,
+                notes
+            }),
+        updatePurchaseOrderStatus: (id, status) => updatePOStatusMutation.mutateAsync({ id, status }),
+        // ... existing legacy helpers if needed
+        fetchSupplierProducts: async (id) => (await api.get(`/suppliers/${id}/products`)).data,
+        linkProductToSupplier: async (supplierId, productId, costPrice, supplierSku, isPreferred) => {
+            await api.post(`/suppliers/${supplierId}/products`, { productId, costPrice, supplierSku, isPreferred });
+            queryClient.invalidateQueries({ queryKey: ['suppliers', activeShop?.id] });
+            return true;
+        },
+        unlinkProduct: async (id) => {
+            await api.delete(`/suppliers/products/${id}`);
+            queryClient.invalidateQueries({ queryKey: ['suppliers', activeShop?.id] });
+            return true;
+        }
     };
 }

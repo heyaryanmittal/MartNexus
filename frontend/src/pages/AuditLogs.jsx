@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuditLogs } from '@/hooks/useAuditLogs';
 export default function AuditLogs() {
-  const { logs, loading, totalCount, fetchLogs, getTableNames } = useAuditLogs();
   const [tableNames, setTableNames] = useState([]);
   const [selectedLog, setSelectedLog] = useState(null);
   const [page, setPage] = useState(1);
@@ -21,14 +20,14 @@ export default function AuditLogs() {
   const [actionFilter, setActionFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  useEffect(() => {
-    fetchLogs({
-      table_name: tableFilter || undefined,
-      action: actionFilter || undefined,
-      date_from: dateFrom || undefined,
-      date_to: dateTo || undefined,
-    }, page, pageSize);
-  }, [fetchLogs, tableFilter, actionFilter, dateFrom, dateTo, page]);
+
+  const { logs, loading, totalCount, getTableNames } = useAuditLogs({
+    table_name: tableFilter || undefined,
+    action: actionFilter || undefined,
+    date_from: dateFrom || undefined,
+    date_to: dateTo || undefined,
+  }, page, pageSize);
+
   useEffect(() => {
     getTableNames().then(setTableNames);
   }, [getTableNames]);
@@ -70,13 +69,13 @@ export default function AuditLogs() {
     return log.record_id?.slice(0, 8) || '-';
   };
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-4">
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <History className="h-8 w-8" />
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+          <History className="h-6 w-6 sm:h-8 sm:w-8" />
           Audit Logs
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Track all changes to inventory, sales, and other data
         </p>
       </div>
@@ -89,7 +88,7 @@ export default function AuditLogs() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <Select value={tableFilter || '__all__'} onValueChange={(val) => setTableFilter(val === '__all__' ? '' : val)}>
               <SelectTrigger>
                 <SelectValue placeholder="All Tables" />
@@ -129,6 +128,7 @@ export default function AuditLogs() {
         </CardHeader>
         <CardContent>
           {loading ? (<p className="text-center py-8 text-muted-foreground">Loading...</p>) : logs.length === 0 ? (<p className="text-center py-8 text-muted-foreground">No audit logs found</p>) : (<>
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -168,6 +168,7 @@ export default function AuditLogs() {
                 </TableRow>))}
               </TableBody>
             </Table>
+            </div>
 
             {}
             <div className="flex items-center justify-between mt-4">

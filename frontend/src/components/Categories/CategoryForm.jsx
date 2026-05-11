@@ -24,7 +24,12 @@ export function CategoryForm({ open, onClose, categoryId, onSuccess }) {
         },
     });
     useEffect(() => {
-        if (categoryId && open) {
+        if (!open) {
+            form.reset({ name: '', description: '' });
+            return;
+        }
+
+        if (categoryId) {
             const category = categories.find(c => c.id === categoryId);
             if (category) {
                 form.reset({
@@ -33,10 +38,7 @@ export function CategoryForm({ open, onClose, categoryId, onSuccess }) {
                 });
             }
         }
-        else if (!open) {
-            form.reset();
-        }
-    }, [categoryId, open, categories]);
+    }, [categoryId, open]); // Only reset when categoryId or open status changes
     const onSubmit = async (data) => {
         try {
             if (categoryId) {

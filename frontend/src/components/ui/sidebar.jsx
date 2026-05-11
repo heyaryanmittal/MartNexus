@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -94,6 +95,10 @@ const Sidebar = React.forwardRef(({ side = "left", variant = "sidebar", collapsi
         <SheetContent data-sidebar="sidebar" data-mobile="true" className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden" style={{
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
             }} side={side}>
+          <VisuallyHidden.Root>
+            <SheetTitle>Menu</SheetTitle>
+            <SheetDescription>Navigation items for the application</SheetDescription>
+          </VisuallyHidden.Root>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
       </Sheet>);

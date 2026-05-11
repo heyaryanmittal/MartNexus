@@ -305,18 +305,17 @@ async function checkLowStockAndNotify() {
 
         for (const shop of shops) {
             
-            const lowStockProducts = await prisma.product.findMany({
+            const allActiveProducts = await prisma.product.findMany({
                 where: {
                     shopId: shop.id,
-                    isActive: true,
-                    stock: {
-                        lte: prisma.raw('reorder_level')
-                    }
+                    isActive: true
                 },
                 include: {
                     category: true
                 }
             });
+
+            const lowStockProducts = allActiveProducts.filter(p => p.stock <= p.reorderLevel);
 
             if (lowStockProducts.length > 0) {
                 totalLowStockProducts += lowStockProducts.length;

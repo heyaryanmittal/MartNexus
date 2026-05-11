@@ -239,4 +239,108 @@ router.post('/reset-password', async (req, res) => {
     }
 });
 
+
+// --- User Management (Admin Functions) ---
+
+const authenticateToken = require('../middleware/authMiddleware');
+
+router.get('/manage-users', authenticateToken, async (req, res) => {
+    try {
+        const users = await prisma.user.findMany({
+            select: { id: true, email: true, name: true, role: true, isVerified: true, createdAt: true }
+        });
+        const userRoles = await prisma.userRole.findMany();
+        const formattedUsers = users.map(user => ({
+            ...user,
+            full_name: user.name,
+            roles: [
+                ...(user.role ? [user.role.toLowerCase()] : []),
+                ...userRoles.filter(ur => ur.user_id === user.id).map(ur => ur.role.toLowerCase())
+            ]
+        }));
+        res.json(formattedUsers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/manage-users/:id/roles', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
+    try {
+        await prisma.userRole.upsert({
+            where: { user_id_role: { user_id: id, role: role.toLowerCase() } },
+            update: {},
+            create: { user_id: id, role: role.toLowerCase() }
+        });
+        res.json({ success: true, message: 'Role assigned successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.delete('/manage-users/:id/roles/:role', authenticateToken, async (req, res) => {
+    const { id, role } = req.params;
+    try {
+        await prisma.userRole.delete({
+            where: { user_id_role: { user_id: id, role: role.toLowerCase() } }
+        });
+        res.json({ success: true, message: 'Role removed successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- Audit Logs ---
+
+router.get('/audit-logs', authenticateToken, async (req, res) => {
+    const { table_name, action, user_id, date_from, date_to, page = 1, pageSize = 50 } = req.query;
+    const where = {};
+    if (table_name) where.table_name = table_name;
+    if (action) where.action = action;
+    if (user_id) where.user_id = user_id;
+    if (date_from || date_to) {
+        where.created_at = {};
+        if (date_from) where.created_at.gte = new Date(date_from);
+        if (date_to) where.created_at.lte = new Date(date_to);
+    }
+    try {
+        const [logs, count] = await Promise.all([
+            prisma.auditLog.findMany({
+                where,
+                orderBy: { created_at: 'desc' },
+                take: parseInt(pageSize),
+                skip: (parseInt(page) - 1) * parseInt(pageSize)
+            }),
+            prisma.auditLog.count({ where })
+        ]);
+        const userIds = [...new Set(logs.map(l => l.user_id).filter(Boolean))];
+        const users = await prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, email: true, name: true }
+        });
+        const userMap = users.reduce((acc, u) => { acc[u.id] = u; return acc; }, {});
+        const formattedLogs = logs.map(log => ({
+            ...log,
+            user_email: log.user_id ? userMap[log.user_id]?.email : null,
+            user_name: log.user_id ? userMap[log.user_id]?.name : null
+        }));
+        res.json({ logs: formattedLogs, totalCount: count });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/audit-logs-tables', authenticateToken, async (req, res) => {
+    try {
+        const tables = await prisma.auditLog.findMany({
+            select: { table_name: true },
+            distinct: ['table_name']
+        });
+        res.json(tables.map(t => t.table_name).sort());
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

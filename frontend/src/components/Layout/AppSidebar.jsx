@@ -4,19 +4,19 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { useRoles } from "@/hooks/useRoles";
 import { PERMISSIONS } from "@/components/RoleGuard";
 const mainItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: PERMISSIONS.VIEW_DASHBOARD },
-  { title: "POS", url: "/pos", icon: CreditCard, roles: PERMISSIONS.USE_POS },
-  { title: "Products", url: "/products", icon: Package, roles: PERMISSIONS.VIEW_PRODUCTS },
-  { title: "Categories", url: "/categories", icon: FolderOpen, roles: PERMISSIONS.MANAGE_PRODUCTS },
-  { title: "Inventory", url: "/inventory", icon: Warehouse, roles: PERMISSIONS.VIEW_INVENTORY },
-  { title: "Sales", url: "/sales", icon: ShoppingCart, roles: PERMISSIONS.VIEW_SALES },
-  { title: "Invoices", url: "/invoices", icon: Receipt, roles: PERMISSIONS.VIEW_SALES },
-  { title: "Reports", url: "/reports", icon: TrendingUp, roles: PERMISSIONS.VIEW_REPORTS },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: ['admin', 'manager', 'cashier', 'user'] },
+  { title: "POS", url: "/pos", icon: CreditCard, roles: ['admin', 'manager', 'cashier', 'user'] },
+  { title: "Products", url: "/products", icon: Package, roles: ['admin', 'manager', 'cashier', 'user'] },
+  { title: "Categories", url: "/categories", icon: FolderOpen, roles: ['admin', 'manager', 'user'] },
+  { title: "Inventory", url: "/inventory", icon: Warehouse, roles: ['admin', 'manager', 'cashier', 'user'] },
+  { title: "Sales", url: "/sales", icon: ShoppingCart, roles: ['admin', 'manager', 'user'] },
+  { title: "Invoices", url: "/invoices", icon: Receipt, roles: ['admin', 'manager', 'user'] },
+  { title: "Reports", url: "/reports", icon: TrendingUp, roles: ['admin', 'manager', 'user'] },
 ];
 const managementItems = [
-  { title: "Suppliers", url: "/suppliers", icon: FileText, roles: PERMISSIONS.VIEW_SUPPLIERS },
-  { title: "Customers", url: "/customers", icon: Users, roles: PERMISSIONS.VIEW_CUSTOMERS },
-  { title: "Audit Logs", url: "/audit-logs", icon: History, roles: ['admin', 'manager'] },
+  { title: "Suppliers", url: "/suppliers", icon: FileText, roles: ['admin', 'manager', 'user'] },
+  { title: "Customers", url: "/customers", icon: Users, roles: ['admin', 'manager', 'cashier', 'user'] },
+  { title: "Audit Logs", url: "/audit-logs", icon: History, roles: ['admin', 'manager', 'user'] },
 ];
 export function AppSidebar() {
   const { open } = useSidebar();
