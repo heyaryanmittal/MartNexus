@@ -6,27 +6,27 @@ const router = express.Router();
 
 
 router.post('/', authenticateToken, async (req, res) => {
-    
-    const sPrice = parseFloat(req.body.sellingPrice ?? req.body.price ?? 0);
-    const cPrice = parseFloat(req.body.costPrice ?? req.body.cost ?? 0);
-    const stockQty = parseFloat(req.body.stock ?? 0);
-    const rLevel = parseFloat(req.body.reorderLevel ?? req.body.reorder_level ?? 5);
+    const body = req.body || {};
+    const sPrice = parseFloat(body.sellingPrice ?? body.price ?? 0);
+    const cPrice = parseFloat(body.costPrice ?? body.cost ?? 0);
+    const stockQty = parseFloat(body.stock ?? 0);
+    const rLevel = parseFloat(body.reorderLevel ?? body.reorder_level ?? 5);
 
     try {
         const product = await prisma.product.create({
             data: {
-                shopId: req.body.shopId,
-                name: req.body.name,
-                categoryId: req.body.categoryId ?? req.body.category_id,
-                quantityType: req.body.quantityType ?? req.body.quantity_type ?? 'PIECES',
+                shopId: body.shopId,
+                name: body.name,
+                categoryId: body.categoryId ?? body.category_id,
+                quantityType: body.quantityType ?? body.quantity_type ?? 'PIECES',
                 costPrice: cPrice,
                 sellingPrice: sPrice,
                 stock: stockQty,
                 reorderLevel: rLevel,
-                sku: req.body.sku,
-                barcode: req.body.barcode,
-                description: req.body.description,
-                isActive: req.body.isActive ?? req.body.is_active ?? true
+                sku: body.sku,
+                barcode: body.barcode,
+                description: body.description,
+                isActive: body.isActive ?? body.is_active ?? true
             }
         });
         res.status(201).json(product);
@@ -75,26 +75,27 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.put('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const sPrice = req.body.sellingPrice !== undefined ? parseFloat(req.body.sellingPrice) : (req.body.price !== undefined ? parseFloat(req.body.price) : undefined);
-    const cPrice = req.body.costPrice !== undefined ? parseFloat(req.body.costPrice) : (req.body.cost !== undefined ? parseFloat(req.body.cost) : undefined);
-    const stockQty = req.body.stock !== undefined ? parseFloat(req.body.stock) : undefined;
-    const rLevel = req.body.reorderLevel !== undefined ? parseFloat(req.body.reorderLevel) : (req.body.reorder_level !== undefined ? parseFloat(req.body.reorder_level) : undefined);
+    const body = req.body || {};
+    const sPrice = body.sellingPrice !== undefined ? parseFloat(body.sellingPrice) : (body.price !== undefined ? parseFloat(body.price) : undefined);
+    const cPrice = body.costPrice !== undefined ? parseFloat(body.costPrice) : (body.cost !== undefined ? parseFloat(body.cost) : undefined);
+    const stockQty = body.stock !== undefined ? parseFloat(body.stock) : undefined;
+    const rLevel = body.reorderLevel !== undefined ? parseFloat(body.reorderLevel) : (body.reorder_level !== undefined ? parseFloat(body.reorder_level) : undefined);
 
     try {
         const product = await prisma.product.update({
             where: { id },
             data: {
-                categoryId: req.body.categoryId ?? req.body.category_id,
-                name: req.body.name,
-                quantityType: req.body.quantityType ?? req.body.quantity_type,
+                categoryId: body.categoryId ?? body.category_id,
+                name: body.name,
+                quantityType: body.quantityType ?? body.quantity_type,
                 costPrice: cPrice,
                 sellingPrice: sPrice,
                 stock: stockQty,
                 reorderLevel: rLevel,
-                sku: req.body.sku,
-                barcode: req.body.barcode,
-                description: req.body.description,
-                isActive: req.body.isActive ?? req.body.is_active
+                sku: body.sku,
+                barcode: body.barcode,
+                description: body.description,
+                isActive: body.isActive ?? body.is_active
             }
         });
         res.json(product);

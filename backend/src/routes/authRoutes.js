@@ -9,7 +9,7 @@ const router = express.Router();
 
 
 router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
     if (!email || !password) {
         return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
 
 
 router.post('/verify-otp', async (req, res) => {
-    const { email, otp } = req.body;
+    const { email, otp } = req.body || {};
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -71,7 +71,7 @@ router.post('/verify-otp', async (req, res) => {
 
 
 router.post('/resend-otp', async (req, res) => {
-    const { email } = req.body;
+    const { email } = req.body || {};
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -96,7 +96,7 @@ router.post('/resend-otp', async (req, res) => {
 
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return res.status(400).json({ message: 'User not found' });
@@ -133,7 +133,7 @@ router.get('/me', require('../middleware/authMiddleware'), async (req, res) => {
 
 
 router.put('/update-profile', require('../middleware/authMiddleware'), async (req, res) => {
-    const { name, email } = req.body;
+    const { name, email } = req.body || {};
     try {
         const user = await prisma.user.update({
             where: { id: req.user.userId || req.user.id },
@@ -147,7 +147,7 @@ router.put('/update-profile', require('../middleware/authMiddleware'), async (re
 
 
 router.post('/change-password', require('../middleware/authMiddleware'), async (req, res) => {
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body || {};
     try {
         const user = await prisma.user.findUnique({
             where: { id: req.user.userId || req.user.id }
@@ -183,7 +183,7 @@ router.post('/change-password', require('../middleware/authMiddleware'), async (
 
 
 router.post('/forgot-password', async (req, res) => {
-    const { email } = req.body;
+    const { email } = req.body || {};
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
@@ -209,7 +209,7 @@ router.post('/forgot-password', async (req, res) => {
 
 
 router.post('/reset-password', async (req, res) => {
-    const { token, newPassword } = req.body;
+    const { token, newPassword } = req.body || {};
     try {
         const user = await prisma.user.findFirst({
             where: {

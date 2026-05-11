@@ -7,7 +7,7 @@ const router = express.Router();
 
 
 router.post('/', authenticateToken, async (req, res) => {
-    const { shopId, customerId, customerName, customerMobile, paymentMode, items } = req.body;
+    const { shopId, customerId, customerName, customerMobile, paymentMode, items } = req.body || {};
 
     console.log("Create Bill Payload:", JSON.stringify(req.body, null, 2));
 

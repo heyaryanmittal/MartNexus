@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.post('/', authenticateToken, async (req, res) => {
-    const { name, address, mobile, gstin } = req.body;
+    const { name, address, mobile, gstin } = req.body || {};
     try {
         const shop = await prisma.shop.create({
             data: {
@@ -38,7 +38,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.put('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const { name, address, mobile, gstin } = req.body;
+    const { name, address, mobile, gstin } = req.body || {};
     try {
         const existingShop = await prisma.shop.findUnique({ where: { id } });
         if (!existingShop) return res.status(404).json({ message: 'Shop not found' });
