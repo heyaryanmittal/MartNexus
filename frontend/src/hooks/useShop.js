@@ -1,31 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 
 export function useShop() {
-    const [shop, setShop] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchShop = async () => {
-        setLoading(true);
-        try {
+    const { data: shops = [], isLoading: loading, error, refetch } = useQuery({
+        queryKey: ['shops'],
+        queryFn: async () => {
             const { data } = await api.get('/shops');
-            if (data && data.length > 0) {
-                setShop(data[0]);
-            } else {
-                setShop(null);
-            }
-        } catch (err) {
-            console.error('Error fetching shop details:', err);
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+            return data || [];
+        },
+    });
 
-    useEffect(() => {
-        fetchShop();
-    }, []);
+    const shop = shops.length > 0 ? shops[0] : null;
 
-    return { shop, loading, error, fetchShop };
+    return { shop, shops, loading, error, fetchShop: refetch };
 }

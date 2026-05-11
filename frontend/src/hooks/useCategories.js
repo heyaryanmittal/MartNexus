@@ -1,62 +1,43 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useAppSelector } from '@/store/hooks';
 
 export function useCategories() {
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(false);
     const { activeShop } = useAppSelector((state) => state.shops);
+    const queryClient = useQueryClient();
 
-    const fetchCategories = useCallback(async () => {
-        if (!activeShop) return;
-        setLoading(true);
-        try {
+    const { data: categories = [], isLoading: loading, error, refetch } = useQuery({
+        queryKey: ['categories', activeShop?.id],
+        queryFn: async () => {
+            if (!activeShop?.id) return [];
             const { data } = await api.get(`/categories?shopId=${activeShop.id}`);
-            setCategories(data || []);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, [activeShop]);
+            return data || [];
+        },
+        enabled: !!activeShop?.id,
+    });
 
-    const createCategory = async (categoryData) => {
-        if (!activeShop) throw new Error("No active shop selected");
-        try {
-            await api.post('/categories', { ...categoryData, shopId: activeShop.id });
-            fetchCategories();
-        } catch (error) {
-            console.error('Error creating category:', error);
-            throw error;
-        }
-    };
+    const createMutation = useMutation({
+        mutationFn: (categoryData) => api.post('/categories', { ...categoryData, shopId: activeShop.id }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories', activeShop?.id] }),
+    });
 
-    const updateCategory = async (id, categoryData) => {
-        try {
-            await api.put(`/categories/${id}`, categoryData);
-            fetchCategories();
-        } catch (error) {
-            console.error('Error updating category:', error);
-            throw error;
-        }
-    };
+    const updateMutation = useMutation({
+        mutationFn: ({ id, categoryData }) => api.put(`/categories/${id}`, categoryData),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories', activeShop?.id] }),
+    });
 
-    const deleteCategory = async (id) => {
-        try {
-            await api.delete(`/categories/${id}`);
-            fetchCategories();
-        } catch (error) {
-            console.error('Error deleting category:', error);
-            throw error;
-        }
-    };
+    const deleteMutation = useMutation({
+        mutationFn: (id) => api.delete(`/categories/${id}`),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories', activeShop?.id] }),
+    });
 
     return {
         categories,
         loading,
-        fetchCategories,
-        createCategory,
-        updateCategory,
-        deleteCategory,
+        error,
+        fetchCategories: refetch,
+        createCategory: createMutation.mutateAsync,
+        updateCategory: (id, categoryData) => updateMutation.mutateAsync({ id, categoryData }),
+        deleteCategory: deleteMutation.mutateAsync,
     };
 }

@@ -38,6 +38,8 @@ model Shop {
   customers  Customer[]
   purchaseOrders PurchaseOrder[]
   owner      User       @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId])
 }
 
 model Product {
@@ -63,6 +65,12 @@ model Product {
   purchaseOrderItems PurchaseOrderItem[]
   customerPricing CustomerPricing[]
   supplierProducts SupplierProduct[]
+
+  @@index([shopId])
+  @@index([categoryId])
+  @@index([barcode])
+  @@index([sku])
+  @@index([isActive])
 }
 
 model Customer {
@@ -78,6 +86,8 @@ model Customer {
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   customPricing CustomerPricing[]
   bills     Bill[]
+
+  @@index([shopId])
 }
 
 model CustomerPricing {
@@ -102,6 +112,8 @@ model Category {
   updatedAt DateTime  @updatedAt
   shop      Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
   products  Product[]
+
+  @@index([shopId])
 }
 
 model StockMovement {
@@ -116,6 +128,9 @@ model StockMovement {
   createdBy       String?
   createdAt       DateTime     @default(now())
   product         Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([createdAt])
 }
 
 model Bill {
@@ -139,6 +154,11 @@ model Bill {
   shop           Shop        @relation(fields: [shopId], references: [id])
   customer       Customer?   @relation(fields: [customerId], references: [id])
   items          BillItem[]
+
+  @@index([shopId])
+  @@index([customerId])
+  @@index([createdAt])
+  @@index([billNumber])
 }
 
 model BillItem {
@@ -150,6 +170,9 @@ model BillItem {
   price     Decimal @db.Decimal(10, 2)
   bill      Bill    @relation(fields: [billId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
+
+  @@index([billId])
+  @@index([productId])
 }
 
 model Backup {

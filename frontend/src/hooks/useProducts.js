@@ -1,27 +1,18 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useAppSelector } from '@/store/hooks';
 
 export function useProducts() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
     const { activeShop } = useAppSelector((state) => state.shops);
+    const queryClient = useQueryClient();
 
-    
-    const getEffectivePrice = useCallback((product) => {
-        
-        const finalPrice = product.price || product.sellingPrice || 0;
-        return { price: finalPrice, hasCustomPrice: false };
-    }, []);
-
-    const fetchProducts = useCallback(async () => {
-        if (!activeShop) return;
-        setLoading(true);
-        try {
+    const { data: products = [], isLoading: loading, error, refetch } = useQuery({
+        queryKey: ['products', activeShop?.id],
+        queryFn: async () => {
+            if (!activeShop?.id) return [];
             const { data } = await api.get(`/products?shopId=${activeShop.id}`);
             
-            const transformedData = (data || []).map(product => {
-                
+            return (data || []).map(product => {
                 const rawSellingPrice = product.sellingPrice || product.price || product.selling_price;
                 const sPrice = parseFloat(rawSellingPrice) || 0;
 
@@ -45,64 +36,37 @@ export function useProducts() {
                     is_active: activeStatus
                 };
             });
-            setProducts(transformedData);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, [activeShop]);
+        },
+        enabled: !!activeShop?.id,
+    });
 
-    const getProduct = async (id) => {
-        
-        try {
-            
-            
-            return products.find(p => p.id === id) || null;
-        } catch (error) {
-            console.error('Error fetching product:', error);
-            return null;
-        }
-    };
+    const createMutation = useMutation({
+        mutationFn: (productData) => api.post('/products', { ...productData, shopId: activeShop.id }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products', activeShop?.id] }),
+    });
 
-    const createProduct = async (productData) => {
-        if (!activeShop) throw new Error("No active shop selected");
-        try {
-            await api.post('/products', { ...productData, shopId: activeShop.id });
-            fetchProducts(); 
-        } catch (error) {
-            console.error('Error creating product:', error);
-            throw error;
-        }
-    };
+    const updateMutation = useMutation({
+        mutationFn: ({ id, productData }) => api.put(`/products/${id}`, productData),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products', activeShop?.id] }),
+    });
 
-    const updateProduct = async (id, productData) => {
-        try {
-            await api.put(`/products/${id}`, productData);
-            fetchProducts();
-        } catch (error) {
-            console.error('Error updating product:', error);
-            throw error;
-        }
-    };
+    const deleteMutation = useMutation({
+        mutationFn: (id) => api.delete(`/products/${id}`),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products', activeShop?.id] }),
+    });
 
-    const deleteProduct = async (id) => {
-        try {
-            await api.delete(`/products/${id}`);
-            fetchProducts();
-        } catch (error) {
-            console.error('Error deleting product:', error);
-            throw error;
-        }
-    };
+    const getProduct = useCallback(async (id) => {
+        return products.find(p => p.id === id) || null;
+    }, [products]);
 
     return {
         products,
         loading,
-        fetchProducts,
+        error,
+        fetchProducts: refetch,
         getProduct,
-        createProduct,
-        updateProduct,
-        deleteProduct,
+        createProduct: createMutation.mutateAsync,
+        updateProduct: (id, productData) => updateMutation.mutateAsync({ id, productData }),
+        deleteProduct: deleteMutation.mutateAsync,
     };
 }

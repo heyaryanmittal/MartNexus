@@ -44,11 +44,8 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const whereClause = {
             shopId,
-            
-            
         };
 
-        
         if (search) {
             whereClause.OR = [
                 { name: { contains: search, mode: 'insensitive' } },
@@ -63,7 +60,24 @@ router.get('/', authenticateToken, async (req, res) => {
 
         const products = await prisma.product.findMany({
             where: whereClause,
-            include: { category: true }, 
+            select: {
+                id: true,
+                name: true,
+                sellingPrice: true,
+                costPrice: true,
+                stock: true,
+                reorderLevel: true,
+                sku: true,
+                barcode: true,
+                isActive: true,
+                categoryId: true,
+                category: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            },
             orderBy: { name: 'asc' }
         });
         res.json(products);
