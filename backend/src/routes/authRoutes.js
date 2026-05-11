@@ -24,17 +24,17 @@ router.post('/register', async (req, res) => {
                 email,
                 password: hashedPassword,
                 otp,
-                otpExpires
+                otpExpires,
+                isVerified: false
             }
         });
 
-        console.log(`User registered: ${email}`);
+        console.log(`User registered: ${email}. OTP: ${otp}`);
         
         try {
             await emailService.sendOTPEmail(email, otp);
         } catch (emailError) {
             console.error('Failed to send OTP email during registration:', emailError);
-            // We still return 201 because the user is created. They can request OTP again.
         }
 
         res.status(201).json({ message: 'User registered. Please verify OTP.' });
@@ -58,16 +58,30 @@ router.post('/verify-otp', async (req, res) => {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
             where: { email },
             data: { isVerified: true, otp: null, otpExpires: null }
         });
 
-        res.json({ message: 'Account verified successfully' });
+        // Generate token for immediate login after verification
+        const token = jwt.sign(
+            { userId: updatedUser.id, id: updatedUser.id, role: updatedUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ 
+            message: 'Account verified successfully',
+            token,
+            userId: updatedUser.id,
+            name: updatedUser.email.split('@')[0],
+            role: updatedUser.role
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 router.post('/resend-otp', async (req, res) => {

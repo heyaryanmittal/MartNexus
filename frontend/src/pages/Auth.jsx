@@ -211,6 +211,8 @@ function SignupForm({ onSwitchToLogin }) {
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -230,9 +232,16 @@ function SignupForm({ onSwitchToLogin }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/auth/verify-otp", { email, otp });
-      toast({ title: "Verified!", description: "Account created. You can now sign in." });
-      onSwitchToLogin();
+      const { data } = await api.post("/auth/verify-otp", { email, otp });
+      
+      // Auto-login logic after verification
+      sessionStorage.setItem("token", data.token);
+      const user = { id: data.userId, email, name: data.name, role: data.role };
+      dispatch(setUser(user));
+      dispatch(setSession({ user, access_token: data.token }));
+      
+      toast({ title: "Verified!", description: "Welcome to MartNexus!" });
+      navigate("/dashboard");
     } catch (err) {
       toast({ title: "Verification Failed", description: err.response?.data?.message || err.message, variant: "destructive" });
     } finally {
