@@ -29,6 +29,7 @@ import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AppLayout } from "./components/Layout/AppLayout";
 import api from "@/lib/api";
+import VisitorLogger from "./hooks/visitlog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <VisitorLogger />
           <AuthHandler>
             <Routes>
               <Route path="/" element={<Index />} />
