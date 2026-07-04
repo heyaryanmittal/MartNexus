@@ -670,12 +670,30 @@ const Index = () => {
           .mn-modern-step, .mn-modern-step:nth-child(even) { flex-direction: column; text-align: center; gap: 2rem; }
           .mn-modern-step p { margin: 0 auto; }
           .mn-step-visual { width: 100%; aspect-ratio: 14/11; height: auto; max-width: 400px; margin: 0 auto; }
+          .mn-solutions-grid { grid-template-columns: repeat(2, 1fr); }
+          .mn-pricing-grid { grid-template-columns: repeat(2, 1fr); }
+          .mn-about-content { flex-direction: column; gap: 2rem; text-align: center; }
+          .mn-about-visual { max-width: 400px; margin: 0 auto; }
         }
         @media (max-width: 768px) {
+          .mn-nav { padding: 0.75rem 1rem; }
+          .mn-nav-logo { font-size: 1.1rem; gap: 0.4rem; }
+          .mn-nav-logo img { width: 32px; height: 32px; }
+          .mn-btn-ghost { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
+          .mn-btn-primary { padding: 0.5rem 1rem; font-size: 0.85rem; }
           .mn-stats { grid-template-columns: repeat(2, 1fr); }
           .mn-cta-card { padding: 4rem 1.5rem; border-radius: 24px; }
-          .mn-footer { flex-direction: column; gap: 2rem; text-align: center; }
+          .mn-solutions-grid { grid-template-columns: 1fr; }
+          .mn-pricing-grid { grid-template-columns: 1fr; }
+          .mn-footer-container { grid-template-columns: 1fr; gap: 2.5rem; text-align: center; }
+          .mn-footer-brand { align-items: center; }
+          .mn-footer-logo { justify-content: center; }
+          .mn-footer-bottom { justify-content: center; flex-direction: column; text-align: center; }
           .mn-section { padding: 5rem 1.5rem; }
+        }
+        @media (max-width: 480px) {
+          .mn-logo-text { display: none; }
+          .mn-stats { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -685,7 +703,7 @@ const Index = () => {
         <nav className="mn-nav">
           <div className="mn-nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <img src="/martnexus.png" alt="MartNexus Logo" />
-            MartNexus
+            <span className="mn-logo-text">MartNexus</span>
           </div>
 
           <div className="mn-nav-links">

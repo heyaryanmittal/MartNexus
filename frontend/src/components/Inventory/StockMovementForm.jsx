@@ -140,7 +140,7 @@ export function StockMovementForm({ open, onClose, onSuccess }) {
                   <FormMessage />
                 </FormItem>)}/>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField control={form.control} name="batch_number" render={({ field }) => (<FormItem>
                     <FormLabel>Batch Number (Optional)</FormLabel>
                     <FormControl>

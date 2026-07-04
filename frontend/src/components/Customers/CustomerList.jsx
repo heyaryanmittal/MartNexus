@@ -59,7 +59,7 @@ export const CustomerList = ({ onAdd, onEdit, onPricing, onHistory }) => {
         </div>
       </div>
 
-      {isLoading ? (<div className="text-center py-8 text-muted-foreground">Loading...</div>) : filteredCustomers.length === 0 ? (<div className="text-center py-8 text-muted-foreground">No customers found</div>) : (<Table>
+      {isLoading ? (<div className="text-center py-8 text-muted-foreground">Loading...</div>) : filteredCustomers.length === 0 ? (<div className="text-center py-8 text-muted-foreground">No customers found</div>) : (<div className="w-full overflow-x-auto"><Table>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
@@ -105,7 +105,7 @@ export const CustomerList = ({ onAdd, onEdit, onPricing, onHistory }) => {
             </TableCell>
           </TableRow>))}
         </TableBody>
-      </Table>)}
+      </Table></div>)}
     </CardContent>
 
     <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

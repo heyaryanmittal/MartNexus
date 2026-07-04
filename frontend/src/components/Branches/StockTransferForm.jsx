@@ -90,7 +90,7 @@ export function StockTransferForm({ open, branches, onClose, onSuccess }) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField control={form.control} name="from_branch_id" render={({ field }) => (<FormItem>
                     <FormLabel>From Branch</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>

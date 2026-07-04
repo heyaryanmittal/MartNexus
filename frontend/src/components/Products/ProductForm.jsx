@@ -159,7 +159,7 @@ export function ProductForm({ open, onClose, productId, onSuccess }) {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-semibold">Product Name *</FormLabel>
@@ -181,7 +181,7 @@ export function ProductForm({ open, onClose, productId, onSuccess }) {
                 )} />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField control={form.control} name="categoryId" render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
@@ -243,7 +243,7 @@ export function ProductForm({ open, onClose, productId, onSuccess }) {
                 </FormItem>
               )} />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField control={form.control} name="sellingPrice" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-semibold">Selling Price *</FormLabel>
@@ -265,7 +265,7 @@ export function ProductForm({ open, onClose, productId, onSuccess }) {
                 )} />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField control={form.control} name="stock" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-semibold">Stock Quantity *</FormLabel>

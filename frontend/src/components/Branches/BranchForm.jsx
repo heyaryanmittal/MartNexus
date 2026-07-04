@@ -101,7 +101,7 @@ export function BranchForm({ open, branchId, onClose, onSuccess }) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField control={form.control} name="name" render={({ field }) => (<FormItem>
                     <FormLabel>Branch Name</FormLabel>
                     <FormControl>
@@ -127,7 +127,7 @@ export function BranchForm({ open, branchId, onClose, onSuccess }) {
                   <FormMessage />
                 </FormItem>)}/>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField control={form.control} name="city" render={({ field }) => (<FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
