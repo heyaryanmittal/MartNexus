@@ -184,57 +184,6 @@ async function retryNotification(req, res) {
 }
 
 
-async function testEmailConfig(req, res) {
-    const { testEmail } = req.body;
-
-    try {
-        if (!testEmail) {
-            return res.status(400).json({
-                success: false,
-                message: 'Test email address is required'
-            });
-        }
-
-        const result = await emailService.sendEmail({
-            to: testEmail,
-            subject: 'Test Email - MartNexus',
-            html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #3b82f6;">Email Configuration Test</h2>
-          <p>This is a test email from MartNexus.</p>
-          <p>If you received this email, your email configuration is working correctly!</p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-          <p style="color: #6b7280; font-size: 12px;">
-            Sent at: ${new Date().toLocaleString('en-IN')}
-          </p>
-        </div>
-      `,
-            type: 'GENERAL'
-        });
-
-        if (result.success) {
-            res.json({
-                success: true,
-                message: 'Test email sent successfully'
-            });
-        } else {
-            res.status(500).json({
-                success: false,
-                message: 'Failed to send test email',
-                error: result.error
-            });
-        }
-    } catch (error) {
-        console.error('Test email error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to test email configuration',
-            error: error.message
-        });
-    }
-}
-
-
 async function deleteNotification(req, res) {
     const { notificationId } = req.params;
 
@@ -421,7 +370,7 @@ module.exports = {
     getNotificationLogs,
     getNotificationStats,
     retryNotification,
-    testEmailConfig,
+
     deleteNotification,
     clearOldNotifications,
     checkLowStockAndNotify

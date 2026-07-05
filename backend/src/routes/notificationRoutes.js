@@ -4,7 +4,6 @@ const {
     getNotificationLogs,
     getNotificationStats,
     retryNotification,
-    testEmailConfig,
     deleteNotification,
     clearOldNotifications
 } = require('../controllers/notificationController');
@@ -18,8 +17,6 @@ router.get('/stats', getNotificationStats);
 
 router.post('/retry/:notificationId', retryNotification);
 
-
-router.post('/test-email', testEmailConfig);
 
 
 router.delete('/:notificationId', deleteNotification);

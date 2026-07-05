@@ -24,7 +24,6 @@ const Notifications = () => {
         type: '',
         status: ''
     });
-    const [testEmail, setTestEmail] = useState('');
 
     useEffect(() => {
         fetchNotifications();
@@ -131,37 +130,6 @@ const Notifications = () => {
         }
     };
 
-    const handleTestEmail = async () => {
-        if (!testEmail) {
-            toast.error('Please enter an email address');
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-            const response = await fetch(`${API_BASE_URL}/notifications/test-email`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-                },
-                body: JSON.stringify({ testEmail })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                toast.success('Test email sent successfully!');
-                setTestEmail('');
-            } else {
-                toast.error(data.message || 'Failed to send test email');
-            }
-        } catch (error) {
-            toast.error('Failed to send test email');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -235,39 +203,6 @@ const Notifications = () => {
                     </div>
                 )}
 
-                { }
-                <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Send className="w-5 h-5 text-gray-600" />
-                        <h3 className="text-lg font-semibold text-gray-900">Test Email Configuration</h3>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="email"
-                            value={testEmail}
-                            onChange={(e) => setTestEmail(e.target.value)}
-                            placeholder="Enter email address to test"
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <button
-                            onClick={handleTestEmail}
-                            disabled={loading}
-                            className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 flex items-center gap-2"
-                        >
-                            {loading ? (
-                                <>
-                                    <RefreshCw className="w-4 h-4 animate-spin" />
-                                    Sending...
-                                </>
-                            ) : (
-                                <>
-                                    <Send className="w-4 h-4" />
-                                    Send Test Email
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
 
                 { }
                 <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
