@@ -192,13 +192,11 @@ const Notifications = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 p-6">
-            <div className="max-w-7xl mx-auto">
-                { }
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">📧 Notifications</h1>
-                    <p className="text-gray-600">Manage email notifications and view logs</p>
-                </div>
+        <div className="space-y-4 sm:space-y-6 pb-4">
+            <div>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">📧 Notifications</h1>
+                <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage email notifications and view logs</p>
+            </div>
 
                 { }
                 {stats && (
@@ -243,7 +241,7 @@ const Notifications = () => {
                         <Send className="w-5 h-5 text-gray-600" />
                         <h3 className="text-lg font-semibold text-gray-900">Test Email Configuration</h3>
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <input
                             type="email"
                             value={testEmail}
@@ -421,7 +419,6 @@ const Notifications = () => {
                         </li>
                     </ul>
                 </div>
-            </div>
 
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>

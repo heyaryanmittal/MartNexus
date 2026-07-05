@@ -266,13 +266,11 @@ const BackupExport = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
-            <div className="max-w-7xl mx-auto">
-                { }
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Backup & Export</h1>
-                    <p className="text-gray-600">Manage your data backups and export reports</p>
-                </div>
+        <div className="space-y-4 sm:space-y-6 pb-4">
+            <div>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Backup & Export</h1>
+                <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage your data backups and export reports</p>
+            </div>
 
                 { }
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -547,7 +545,6 @@ const BackupExport = () => {
                         </li>
                     </ul>
                 </div>
-            </div>
 
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
