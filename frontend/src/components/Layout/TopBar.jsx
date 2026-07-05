@@ -89,7 +89,7 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/notifications")}>
           <Bell className="h-5 w-5" />
         </Button>
 
