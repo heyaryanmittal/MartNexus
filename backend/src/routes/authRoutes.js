@@ -334,11 +334,30 @@ router.get('/audit-logs', authenticateToken, async (req, res) => {
             select: { id: true, email: true, name: true }
         });
         const userMap = users.reduce((acc, u) => { acc[u.id] = u; return acc; }, {});
-        const formattedLogs = logs.map(log => ({
-            ...log,
-            user_email: log.user_id ? userMap[log.user_id]?.email : null,
-            user_name: log.user_id ? userMap[log.user_id]?.name : null
-        }));
+        const formattedLogs = logs.map(log => {
+            const old_data = log.old_values ? (typeof log.old_values === 'string' ? JSON.parse(log.old_values) : log.old_values) : null;
+            const new_data = log.new_values ? (typeof log.new_values === 'string' ? JSON.parse(log.new_values) : log.new_values) : null;
+            
+            let changed_fields = [];
+            if (log.action === 'UPDATE' && old_data && new_data) {
+                changed_fields = Object.keys(new_data).filter(key => {
+                    return JSON.stringify(old_data[key]) !== JSON.stringify(new_data[key]);
+                });
+            } else if (log.action === 'INSERT' && new_data) {
+                changed_fields = Object.keys(new_data);
+            } else if (log.action === 'DELETE' && old_data) {
+                changed_fields = Object.keys(old_data);
+            }
+
+            return {
+                ...log,
+                old_data,
+                new_data,
+                changed_fields,
+                user_email: log.user_id ? userMap[log.user_id]?.email : null,
+                user_name: log.user_id ? userMap[log.user_id]?.name : null
+            };
+        });
         res.json({ logs: formattedLogs, totalCount: count });
     } catch (error) {
         res.status(500).json({ error: error.message });

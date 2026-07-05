@@ -11,7 +11,6 @@ router.post('/', authenticateToken, async (req, res) => {
     const cPrice = parseFloat(body.costPrice ?? body.cost ?? 0);
     const stockQty = parseFloat(body.stock ?? 0);
     const rLevel = parseFloat(body.reorderLevel ?? body.reorder_level ?? 5);
-
     try {
         const product = await prisma.product.create({
             data: {
@@ -29,6 +28,17 @@ router.post('/', authenticateToken, async (req, res) => {
                 isActive: body.isActive ?? body.is_active ?? true
             }
         });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Product',
+                action: 'INSERT',
+                user_id: req.user.userId,
+                record_id: product.id,
+                new_values: product
+            }
+        });
+
         res.status(201).json(product);
     } catch (error) {
         console.error("Error creating product:", error);
@@ -96,6 +106,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const rLevel = body.reorderLevel !== undefined ? parseFloat(body.reorderLevel) : (body.reorder_level !== undefined ? parseFloat(body.reorder_level) : undefined);
 
     try {
+        const existingProduct = await prisma.product.findUnique({ where: { id } });
+        if (!existingProduct) return res.status(404).json({ message: 'Product not found' });
+
         const product = await prisma.product.update({
             where: { id },
             data: {
@@ -112,6 +125,18 @@ router.put('/:id', authenticateToken, async (req, res) => {
                 isActive: body.isActive ?? body.is_active
             }
         });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Product',
+                action: 'UPDATE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingProduct,
+                new_values: product
+            }
+        });
+
         res.json(product);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -122,7 +147,21 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
+        const existingProduct = await prisma.product.findUnique({ where: { id } });
+        if (!existingProduct) return res.status(404).json({ message: 'Product not found' });
+
         await prisma.product.delete({ where: { id } });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Product',
+                action: 'DELETE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingProduct
+            }
+        });
+
         res.json({ message: 'Product deleted' });
     } catch (error) {
         res.status(500).json({ error: error.message });

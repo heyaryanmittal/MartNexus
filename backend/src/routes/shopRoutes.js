@@ -17,6 +17,17 @@ router.post('/', authenticateToken, async (req, res) => {
                 ownerId: req.user.userId
             }
         });
+        
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Shop',
+                action: 'INSERT',
+                user_id: req.user.userId,
+                record_id: shop.id,
+                new_values: shop
+            }
+        });
+
         res.status(201).json(shop);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -48,6 +59,18 @@ router.put('/:id', authenticateToken, async (req, res) => {
             where: { id },
             data: { name, address, mobile, gstin }
         });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Shop',
+                action: 'UPDATE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingShop,
+                new_values: shop
+            }
+        });
+
         res.json(shop);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -124,7 +147,22 @@ router.delete('/:id', authenticateToken, async (req, res) => {
             
             await tx.supplier.deleteMany({ where: { shopId: id } });
 
-            
+            await tx.auditLog.create({
+                data: {
+                    table_name: 'Shop',
+                    action: 'DELETE',
+                    user_id: req.user.userId,
+                    record_id: id,
+                    old_values: {
+                        id: existingShop.id,
+                        name: existingShop.name,
+                        address: existingShop.address,
+                        mobile: existingShop.mobile,
+                        gstin: existingShop.gstin
+                    }
+                }
+            });
+
             await tx.shop.delete({ where: { id } });
         });
 

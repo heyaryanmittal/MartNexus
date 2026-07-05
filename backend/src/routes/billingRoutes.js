@@ -132,6 +132,24 @@ router.post('/', authenticateToken, async (req, res) => {
                 }
             });
 
+            await prisma.auditLog.create({
+                data: {
+                    table_name: 'Bill',
+                    action: 'INSERT',
+                    user_id: req.user.userId,
+                    record_id: bill.id,
+                    new_values: {
+                        id: bill.id,
+                        billNumber: bill.billNumber,
+                        customerName: bill.customerName,
+                        customerMobile: bill.customerMobile,
+                        paymentMode: bill.paymentMode,
+                        grandTotal: bill.grandTotal,
+                        status: bill.status
+                    }
+                }
+            });
+
             return bill;
         });
 
@@ -168,6 +186,31 @@ router.post('/:id/cancel', authenticateToken, async (req, res) => {
             const updatedBill = await prisma.bill.update({
                 where: { id },
                 data: { status: 'CANCELLED' }
+            });
+
+            await prisma.auditLog.create({
+                data: {
+                    table_name: 'Bill',
+                    action: 'UPDATE',
+                    user_id: req.user.userId,
+                    record_id: id,
+                    old_values: {
+                        id: bill.id,
+                        billNumber: bill.billNumber,
+                        customerName: bill.customerName,
+                        paymentMode: bill.paymentMode,
+                        grandTotal: bill.grandTotal,
+                        status: bill.status
+                    },
+                    new_values: {
+                        id: updatedBill.id,
+                        billNumber: updatedBill.billNumber,
+                        customerName: updatedBill.customerName,
+                        paymentMode: updatedBill.paymentMode,
+                        grandTotal: updatedBill.grandTotal,
+                        status: updatedBill.status
+                    }
+                }
             });
 
             return updatedBill;

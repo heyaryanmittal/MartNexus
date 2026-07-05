@@ -76,6 +76,16 @@ router.post('/', authenticateToken, async (req, res) => {
                 data: { stock: newStock }
             });
 
+            await prisma.auditLog.create({
+                data: {
+                    table_name: 'StockMovement',
+                    action: 'INSERT',
+                    user_id: req.user.userId,
+                    record_id: movement.id,
+                    new_values: movement
+                }
+            });
+
             return movement;
         });
 

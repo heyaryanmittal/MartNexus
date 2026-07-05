@@ -24,11 +24,21 @@ router.get('/', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
     const { shopId, name, code, contact_person, email, phone, address, city, payment_terms, notes, is_active } = req.body;
     if (!shopId || !name) return res.status(400).json({ error: 'Shop ID and Name are required' });
-
     try {
         const supplier = await prisma.supplier.create({
             data: { shopId, name, code, contact_person, email, phone, address, city, payment_terms, notes, is_active }
         });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Supplier',
+                action: 'INSERT',
+                user_id: req.user.userId,
+                record_id: supplier.id,
+                new_values: supplier
+            }
+        });
+
         res.status(201).json(supplier);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -40,10 +50,25 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const { name, code, contact_person, email, phone, address, city, payment_terms, notes, is_active } = req.body;
     try {
+        const existingSupplier = await prisma.supplier.findUnique({ where: { id } });
+        if (!existingSupplier) return res.status(404).json({ message: 'Supplier not found' });
+
         const supplier = await prisma.supplier.update({
             where: { id },
             data: { name, code, contact_person, email, phone, address, city, payment_terms, notes, is_active }
         });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Supplier',
+                action: 'UPDATE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingSupplier,
+                new_values: supplier
+            }
+        });
+
         res.json(supplier);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -54,7 +79,21 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
+        const existingSupplier = await prisma.supplier.findUnique({ where: { id } });
+        if (!existingSupplier) return res.status(404).json({ message: 'Supplier not found' });
+
         await prisma.supplier.delete({ where: { id } });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Supplier',
+                action: 'DELETE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingSupplier
+            }
+        });
+
         res.json({ message: 'Supplier deleted' });
     } catch (error) {
         res.status(500).json({ error: error.message });

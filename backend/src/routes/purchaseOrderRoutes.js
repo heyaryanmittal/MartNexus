@@ -32,10 +32,8 @@ router.post('/', authenticateToken, async (req, res) => {
     if (!shopId || !supplier_id || !items || items.length === 0) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
-
     try {
         const total_amount = items.reduce((acc, item) => acc + (item.quantity * item.costPrice), 0);
-
         const po = await prisma.purchaseOrder.create({
             data: {
                 shopId,
@@ -54,6 +52,17 @@ router.post('/', authenticateToken, async (req, res) => {
             },
             include: { items: true }
         });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'PurchaseOrder',
+                action: 'INSERT',
+                user_id: req.user.userId,
+                record_id: po.id,
+                new_values: po
+            }
+        });
+
         res.status(201).json(po);
     } catch (error) {
         console.error("Error creating PO:", error);
@@ -67,9 +76,23 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
     const { status } = req.body;
 
     try {
+        const existingPo = await prisma.purchaseOrder.findUnique({ where: { id } });
+        if (!existingPo) return res.status(404).json({ message: 'Purchase Order not found' });
+
         const po = await prisma.purchaseOrder.update({
             where: { id },
             data: { status }
+        });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'PurchaseOrder',
+                action: 'UPDATE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingPo,
+                new_values: po
+            }
         });
 
         

@@ -29,7 +29,6 @@ router.post('/', authenticateToken, async (req, res) => {
     console.log('Parsed discount:', parseFloat(discountPercentage) || 0);
 
     if (!shopId || !name) return res.status(400).json({ error: 'Shop ID and Name are required' });
-
     try {
         const customer = await prisma.customer.create({
             data: {
@@ -42,6 +41,17 @@ router.post('/', authenticateToken, async (req, res) => {
             }
         });
         console.log('Created customer:', customer);
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Customer',
+                action: 'INSERT',
+                user_id: req.user.userId,
+                record_id: customer.id,
+                new_values: customer
+            }
+        });
+
         res.status(201).json(customer);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -58,6 +68,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
     console.log('Discount value:', discountPercentage);
 
     try {
+        const existingCustomer = await prisma.customer.findUnique({ where: { id } });
+        if (!existingCustomer) return res.status(404).json({ message: 'Customer not found' });
+
         const customer = await prisma.customer.update({
             where: { id },
             data: {
@@ -69,6 +82,18 @@ router.put('/:id', authenticateToken, async (req, res) => {
             }
         });
         console.log('Updated customer:', customer);
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Customer',
+                action: 'UPDATE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingCustomer,
+                new_values: customer
+            }
+        });
+
         res.json(customer);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -79,7 +104,21 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     try {
+        const existingCustomer = await prisma.customer.findUnique({ where: { id } });
+        if (!existingCustomer) return res.status(404).json({ message: 'Customer not found' });
+
         await prisma.customer.delete({ where: { id } });
+
+        await prisma.auditLog.create({
+            data: {
+                table_name: 'Customer',
+                action: 'DELETE',
+                user_id: req.user.userId,
+                record_id: id,
+                old_values: existingCustomer
+            }
+        });
+
         res.json({ message: 'Customer deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
