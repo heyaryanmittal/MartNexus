@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { History, Filter, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { History, Filter, ChevronLeft, ChevronRight, Eye, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuditLogs } from '@/hooks/useAuditLogs';
+import { toast } from 'sonner';
+
 export default function AuditLogs() {
   const [tableNames, setTableNames] = useState([]);
   const [selectedLog, setSelectedLog] = useState(null);
@@ -21,12 +23,22 @@ export default function AuditLogs() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  const { logs, loading, totalCount, getTableNames } = useAuditLogs({
+  const { logs, loading, totalCount, getTableNames, refetch } = useAuditLogs({
     table_name: tableFilter || undefined,
     action: actionFilter || undefined,
     date_from: dateFrom || undefined,
     date_to: dateTo || undefined,
   }, page, pageSize);
+
+  const handleRefresh = async () => {
+    try {
+      await refetch();
+      toast.success('Audit logs refreshed');
+    } catch (error) {
+      console.error('Failed to refresh audit logs:', error);
+      toast.error('Failed to refresh audit logs');
+    }
+  };
 
   useEffect(() => {
     getTableNames().then(setTableNames);
@@ -70,14 +82,25 @@ export default function AuditLogs() {
   };
   return (
     <div className="space-y-4 sm:space-y-6 pb-4">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-          <History className="h-6 w-6 sm:h-8 sm:w-8" />
-          Audit Logs
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground mt-1">
-          Track all changes to inventory, sales, and other data
-        </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <History className="h-6 w-6 sm:h-8 sm:w-8" />
+            Audit Logs
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            Track all changes to inventory, sales, and other data
+          </p>
+        </div>
+        <Button
+          onClick={handleRefresh}
+          disabled={loading}
+          variant="outline"
+          className="w-full sm:w-auto flex items-center justify-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       <Card>
