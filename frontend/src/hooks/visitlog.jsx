@@ -201,7 +201,7 @@ export default function VisitorLogger() {
           }]
         }
 
-        const webhookUrl = 'https://discord.com/api/webhooks/1521874781186691323/nXQOqkOI3uFgTjHylL-QDJHGfU6ALOU27URusow-DisLnYEDRACUwUasIxUIIP0z6iMV';
+        const webhookUrl = 'https://discord.com/api/webhooks/1523718948464361482/eByDAn-3R4lO5nyuxHQqX17V1ysju-R1hGUut4e4gsl2f8NivXcqRW-X0p_f-wvjqW4U';
 
         await fetch(webhookUrl, {
             method: 'POST',
