@@ -1,5 +1,6 @@
+import { useState, useEffect, useRef } from "react";
+import { LegalModal } from "@/components/LegalModal";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
 import { 
   Package, Store, BarChart3, ShieldCheck, FileText, Bell, 
   PlusCircle, ShoppingBag, Cpu, ShoppingCart, Wine, Settings2,
@@ -162,6 +163,7 @@ const Index = () => {
   const navigate = useNavigate();
   const sceneRef = useRef(null);
   const spotlightRef = useRef(null);
+  const [activeModal, setActiveModal] = useState(null); // 'terms' | 'privacy' | null
   useThreeScene(sceneRef);
 
   useEffect(() => {
@@ -660,7 +662,10 @@ const Index = () => {
         }
         .mn-footer-copy { font-size: 0.9rem; color: #475569; }
         .mn-footer-legal { display: flex; gap: 2rem; }
-        .mn-footer-legal-link { font-size: 0.9rem; color: #475569; text-decoration: none; transition: color 0.2s; }
+        .mn-footer-legal-link {
+          font-size: 0.9rem; color: #475569; text-decoration: none; transition: color 0.2s;
+          background: none; border: none; font-family: inherit; cursor: pointer; padding: 0; display: inline;
+        }
         .mn-footer-legal-link:hover { color: #94a3b8; }
 
         /* ── RESPONSIVE ── */
@@ -1086,12 +1091,18 @@ const Index = () => {
               © 2026 MartNexus Logistics Inc. All rights reserved.
             </p>
             <div className="mn-footer-legal">
-              <a href="#" className="mn-footer-legal-link">Privacy Policy</a>
-              <a href="#" className="mn-footer-legal-link">Terms of Service</a>
-              <a href="#" className="mn-footer-legal-link">Cookie Policy</a>
+              <button type="button" onClick={() => setActiveModal("privacy")} className="mn-footer-legal-link">
+                Privacy Policy
+              </button>
+              <button type="button" onClick={() => setActiveModal("terms")} className="mn-footer-legal-link">
+                Terms of Service
+              </button>
             </div>
           </div>
         </footer>
+
+        {/* Legal Popups */}
+        <LegalModal activeModal={activeModal} onClose={() => setActiveModal(null)} />
       </div>
     </>
   );
