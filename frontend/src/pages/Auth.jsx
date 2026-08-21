@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Eye, EyeOff, ArrowLeft, Mail, Lock, User, ShieldCheck } from "lucide-react";
+import { Loader2, Eye, EyeOff, ArrowLeft, Mail, Lock, User, ShieldCheck, Check, X } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setUser, setSession } from "@/store/slices/authSlice";
 import { LegalModal } from "@/components/LegalModal";
@@ -203,6 +203,34 @@ function LoginForm({ onSwitchToSignup }) {
 }
 
 /* ─────────────────────────────────────────
+   Password Strength Helpers
+───────────────────────────────────────── */
+function getPasswordCriteria(password) {
+  return [
+    { label: "8+ characters", met: password.length >= 8 },
+    { label: "Upper & lowercase letters", met: /[a-z]/.test(password) && /[A-Z]/.test(password) },
+    { label: "At least one number", met: /[0-9]/.test(password) },
+    { label: "Special character (!@#$)", met: /[^A-Za-z0-9]/.test(password) },
+  ];
+}
+
+function getPasswordStrength(password) {
+  if (!password) {
+    return { score: 0, label: "", color: "", isStrong: false };
+  }
+  const criteria = getPasswordCriteria(password);
+  const metCount = criteria.filter((c) => c.met).length;
+
+  if (password.length < 8 || metCount <= 1) {
+    return { score: 1, label: "Weak", color: "red", isStrong: false };
+  } else if (metCount < 4) {
+    return { score: 2, label: "Medium", color: "orange", isStrong: false };
+  } else {
+    return { score: 3, label: "Strong", color: "green", isStrong: true };
+  }
+}
+
+/* ─────────────────────────────────────────
    Signup Form
 ───────────────────────────────────────── */
 function SignupForm({ onSwitchToLogin }) {
@@ -216,8 +244,19 @@ function SignupForm({ onSwitchToLogin }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const strength = getPasswordStrength(password);
+  const criteria = getPasswordCriteria(password);
+
   const handleSignup = async (e) => {
     e.preventDefault();
+    if (!strength.isStrong) {
+      toast({
+        title: "Weak Password",
+        description: "Please fulfill all password requirements to create a strong password.",
+        variant: "destructive"
+      });
+      return;
+    }
     setLoading(true);
     try {
       await api.post("/auth/register", { email, password });
@@ -290,6 +329,30 @@ function SignupForm({ onSwitchToLogin }) {
           <label htmlFor="signup-password" className="auth-label">Password</label>
           <PasswordInput placeholder="Create a strong password" value={password}
             onChange={e => setPassword(e.target.value)} required disabled={loading} autoComplete="new-password" />
+
+          {password.length > 0 && (
+            <div className="auth-pw-strength-wrap">
+              <div className="auth-pw-strength-header">
+                <span className="auth-pw-strength-title">Password Strength:</span>
+                <span className={`auth-pw-strength-label ${strength.color}`}>
+                  {strength.label}
+                </span>
+              </div>
+              <div className="auth-pw-strength-bars">
+                <div className={`auth-pw-bar ${strength.score >= 1 ? `active-${strength.color}` : ""}`} />
+                <div className={`auth-pw-bar ${strength.score >= 2 ? `active-${strength.color}` : ""}`} />
+                <div className={`auth-pw-bar ${strength.score >= 3 ? `active-${strength.color}` : ""}`} />
+              </div>
+              <div className="auth-pw-checklist">
+                {criteria.map((item, idx) => (
+                  <div key={idx} className={`auth-pw-check-item ${item.met ? "met" : ""}`}>
+                    {item.met ? <Check size={13} className="check-icon-met" /> : <X size={13} className="check-icon-unmet" />}
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <p className="auth-terms">
@@ -303,9 +366,19 @@ function SignupForm({ onSwitchToLogin }) {
           </button>.
         </p>
 
-        <button type="submit" className="auth-submit-btn" disabled={loading}>
+        <button 
+          type="submit" 
+          className="auth-submit-btn" 
+          disabled={loading || (password.length > 0 && !strength.isStrong)}
+        >
           {loading ? <Loader2 size={18} className="spin" /> : "Create Account →"}
         </button>
+
+        {password.length > 0 && !strength.isStrong && (
+          <p className="auth-pw-hint">
+            * Create a <strong>Strong password</strong> to enable account creation.
+          </p>
+        )}
       </form>
 
       <p className="auth-switch-text">
@@ -533,6 +606,91 @@ export default function Auth() {
         .auth-tab.active {
           background: rgba(99,102,241,0.2); color: #a5b4fc;
           box-shadow: inset 0 1px 1px rgba(99,102,241,0.1);
+        }
+
+        /* ── Password Strength Bar ── */
+        .auth-pw-strength-wrap {
+          margin-top: 0.6rem;
+          padding: 0.75rem;
+          background: rgba(15, 23, 42, 0.6);
+          border: 1px solid rgba(99, 102, 241, 0.15);
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .auth-pw-strength-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.78rem;
+        }
+        .auth-pw-strength-title {
+          color: #94a3b8;
+          font-weight: 500;
+        }
+        .auth-pw-strength-label {
+          font-weight: 700;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .auth-pw-strength-label.red { color: #ef4444; }
+        .auth-pw-strength-label.orange { color: #f97316; }
+        .auth-pw-strength-label.green { color: #22c55e; }
+
+        .auth-pw-strength-bars {
+          display: flex;
+          gap: 6px;
+          height: 6px;
+          width: 100%;
+        }
+        .auth-pw-bar {
+          flex: 1;
+          height: 100%;
+          border-radius: 4px;
+          background: rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
+        }
+        .auth-pw-bar.active-red {
+          background: #ef4444;
+          box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        .auth-pw-bar.active-orange {
+          background: #f97316;
+          box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+        }
+        .auth-pw-bar.active-green {
+          background: #22c55e;
+          box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .auth-pw-checklist {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.4rem 0.6rem;
+          margin-top: 0.25rem;
+        }
+        .auth-pw-check-item {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.74rem;
+          color: #64748b;
+          transition: color 0.2s ease;
+        }
+        .auth-pw-check-item.met {
+          color: #4ade80;
+          font-weight: 500;
+        }
+        .check-icon-met { color: #22c55e; }
+        .check-icon-unmet { color: #64748b; opacity: 0.7; }
+
+        .auth-pw-hint {
+          font-size: 0.76rem;
+          color: #f87171;
+          text-align: center;
+          margin-top: 0.25rem;
         }
 
         /* ── Spin ── */

@@ -14,6 +14,20 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ message: 'Email and password are required' });
     }
     
+    // Validate strong password requirements: 8+ chars, lowercase, uppercase, number, and special character
+    const isStrongPassword = 
+        password.length >= 8 &&
+        /[a-z]/.test(password) &&
+        /[A-Z]/.test(password) &&
+        /[0-9]/.test(password) &&
+        /[^A-Za-z0-9]/.test(password);
+
+    if (!isStrongPassword) {
+        return res.status(400).json({ 
+            message: 'Password is not strong enough. It must be at least 8 characters long and include uppercase, lowercase, digits, and special characters.' 
+        });
+    }
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
