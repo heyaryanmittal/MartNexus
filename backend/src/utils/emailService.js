@@ -696,9 +696,8 @@ class EmailService {
     });
   }
 
-  async sendForgotPasswordEmail(userEmail, resetToken) {
+  async sendForgotPasswordEmail(userEmail, otp) {
     const subject = 'Reset Your Password - MartNexus';
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
 
     const html = `
       <!DOCTYPE html>
@@ -725,26 +724,18 @@ class EmailService {
               Hello,
             </p>
             <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-              You requested to reset your password. Please click the button below to set a new password:
+              You requested to reset your password. Please use the following 6-digit code to set a new password:
             </p>
 
-            <!-- Action Button -->
+            <!-- OTP Box -->
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetUrl}" 
-                 style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                Reset Password
-              </a>
+              <div style="display: inline-block; background: #f3f4f6; color: #1f2937; letter-spacing: 5px; padding: 15px 30px; border-radius: 8px; font-weight: 700; font-size: 24px; border: 2px dashed #d1d5db;">
+                ${otp}
+              </div>
             </div>
 
             <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
-              Or copy and paste this link in your browser:
-            </p>
-            <p style="color: #3b82f6; font-size: 12px; word-break: break-all;">
-              ${resetUrl}
-            </p>
-
-            <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
-              This link will expire in 1 hour. If you didn't request this, please ignore this email.
+              This code will expire in 1 hour. If you didn't request this, please ignore this email.
             </p>
           </div>
 

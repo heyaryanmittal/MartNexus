@@ -215,20 +215,20 @@ router.post('/forgot-password', async (req, res) => {
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
-            return res.json({ message: 'If an account exists with this email, a reset link has been sent.' });
+            return res.json({ message: 'If an account exists with this email, a reset code has been sent.' });
         }
 
-        const resetToken = crypto.randomBytes(32).toString('hex');
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
 
         await prisma.user.update({
             where: { email },
-            data: { resetToken, resetTokenExpires }
+            data: { resetToken: otp, resetTokenExpires }
         });
 
-        await emailService.sendForgotPasswordEmail(email, resetToken);
+        await emailService.sendForgotPasswordEmail(email, otp);
 
-        res.json({ message: 'If an account exists with this email, a reset link has been sent.' });
+        res.json({ message: 'If an account exists with this email, a reset code has been sent.' });
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({ error: error.message });
@@ -237,17 +237,18 @@ router.post('/forgot-password', async (req, res) => {
 
 
 router.post('/reset-password', async (req, res) => {
-    const { token, newPassword } = req.body || {};
+    const { email, otp, newPassword } = req.body || {};
     try {
         const user = await prisma.user.findFirst({
             where: {
-                resetToken: token,
+                email: email,
+                resetToken: otp,
                 resetTokenExpires: { gt: new Date() }
             }
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired reset token' });
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
